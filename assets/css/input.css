@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Smooth scrolling for the whole page */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Dark mode background defaults */
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+  
+  /* Form input dark mode fixes */
+  .dark input, .dark select, .dark textarea {
+    @apply bg-gray-800 border-gray-700 text-white placeholder-gray-500;
+  }
+  
+  .dark input:focus, .dark select:focus, .dark textarea:focus {
+    @apply ring-primary border-primary;
+  }
+}
+
+@layer components {
+  /* Glassmorphism card */
+  .glass-card {
+    @apply bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg border border-white/20 dark:border-gray-700/50 shadow-xl rounded-2xl;
+  }
+  
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-[color:var(--primary-color)] hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 active:scale-95;
+  }
+  
+  /* Skeleton Loader */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar hiding utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
