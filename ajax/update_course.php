@@ -56,7 +56,7 @@ try {
         'id' => $id
     ]);
 
-    logActivity($pdo, $_SESSION['user_id'], 'Updated Course', "Updated course: $name ($code)");
+    log_activity($_SESSION['user_id'], 'Updated Course', "Updated course: $name ($code)");
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

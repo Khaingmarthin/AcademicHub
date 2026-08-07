@@ -23,112 +23,68 @@ $current_academic_year_id = $_SESSION['current_academic_year_id'] ?? '';
             <p class="mt-2 text-sm text-gray-600 font-medium">Manage all university announcements efficiently.</p>
         </div>
 
-        <!-- Top Toolbar -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <!-- Search Bar -->
-            <div class="relative w-full md:w-96 group flex">
-                <div class="relative flex-1">
-                    <input type="text" id="filter_search" placeholder="Search announcements..." 
-                        class="block w-full px-4 py-2.5 border border-gray-200 rounded-l-xl leading-5 bg-white shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 sm:text-sm transition-all duration-200">
-                </div>
-                <button id="btn_search" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-r-xl shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20 border border-blue-600 border-l-0">
-                    Search
-                </button>
-            </div>
-
-            <!-- Add Button -->
-            <a href="create_announcement.php" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 w-full md:w-auto">
-                <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
-                Add Announcement
-            </a>
-        </div>
-
-        <!-- Filter Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Toolbar & Filters -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <div class="flex flex-col xl:flex-row gap-4 w-full">
                 
-                <!-- Category -->
-                <div>
-                    <label for="filter_category" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Category</label>
-                    <div class="relative">
-                        <select id="filter_category" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors cursor-pointer appearance-none">
+                <!-- Search Bar -->
+                <div class="relative w-full xl:w-96 flex-shrink-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="filter_search" placeholder="Search announcements..." 
+                        class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
+                </div>
+                
+                <!-- Filters -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 flex-1 w-full">
+                    <div class="relative w-full">
+                        <select id="filter_category" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
                             <option value="">All Categories</option>
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['category_name']); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                        </div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                     </div>
-                </div>
-
-                <!-- Status -->
-                <div>
-                    <label for="filter_status" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
-                    <div class="relative">
-                        <select id="filter_status" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors cursor-pointer appearance-none">
+                    
+                    <div class="relative w-full">
+                        <select id="filter_status" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
                             <option value="">All Statuses</option>
                             <option value="published">Published</option>
                             <option value="draft">Draft</option>
                             <option value="archived">Archived</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                        </div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                     </div>
-                </div>
-
-                <!-- Date From -->
-                <div>
-                    <label for="filter_date_from" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">From Date</label>
-                    <input type="date" id="filter_date_from" class="block w-full py-2 px-3 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors cursor-pointer text-gray-700">
-                </div>
-
-                <!-- Date To -->
-                <div>
-                    <label for="filter_date_to" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">To Date</label>
-                    <input type="date" id="filter_date_to" class="block w-full py-2 px-3 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors cursor-pointer text-gray-700">
-                </div>
-            </div>
-
-            <!-- Bottom Filter Actions -->
-            <div class="mt-5 pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm font-medium text-gray-600">Sort:</span>
-                        <div class="relative">
-                            <select id="filter_sort" class="py-1.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors cursor-pointer appearance-none font-medium">
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="most_viewed">Most Viewed</option>
-                                <option value="recently_updated">Recently Updated</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                            </div>
-                        </div>
+                    
+                    <div class="relative w-full">
+                        <select id="filter_sort" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="most_viewed">Most Viewed</option>
+                            <option value="recently_updated">Recently Updated</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                     </div>
-                    <div class="h-6 w-px bg-gray-200 hidden sm:block"></div>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm font-medium text-gray-600">Show:</span>
-                        <div class="relative">
-                            <select id="filter_limit" class="py-1.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors cursor-pointer appearance-none font-medium">
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                            </div>
-                        </div>
-                    </div>
+                    
+                    <input type="hidden" id="filter_date_from" value="">
+                    <input type="hidden" id="filter_date_to" value="">
+                    <input type="hidden" id="filter_limit" value="10">
                 </div>
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <button id="btn_reset" class="flex-1 sm:flex-none px-4 py-2 border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                        Reset Filters
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
+                    <button id="btn_search" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                        <i data-lucide="search" class="w-4 h-4"></i> Search
                     </button>
+                    <button id="btn_reset" class="w-full sm:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+                    </button>
+                    <div class="hidden xl:block w-px h-8 bg-gray-200 mx-1 self-center"></div>
+                    <a href="create_announcement.php" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add
+                    </a>
                 </div>
             </div>
         </div>

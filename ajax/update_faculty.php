@@ -20,8 +20,6 @@ if (!verify_csrf_token($csrf_token)) {
 $id = (int)($_POST['id'] ?? 0);
 $name = trim($_POST['name'] ?? '');
 $code = trim($_POST['code'] ?? '');
-$type = trim($_POST['type'] ?? 'Academic Faculty');
-$status = trim($_POST['status'] ?? 'Active');
 $vision = trim($_POST['vision'] ?? '');
 $mission = trim($_POST['mission'] ?? '');
 $description = trim($_POST['description'] ?? '');
@@ -40,19 +38,18 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("UPDATE faculties SET faculty_name = :name, faculty_code = :code, faculty_type = :type, vision = :vision, mission = :mission, description = :desc, status = :status WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE faculties SET faculty_name = :name, faculty_code = :code, vision = :vision, mission = :mission, description = :desc WHERE id = :id");
     $stmt->execute([
         'name' => $name,
         'code' => $code,
-        'type' => $type,
         'vision' => $vision,
         'mission' => $mission,
         'desc' => $description,
-        'status' => $status,
         'id' => $id
     ]);
 
-    logActivity($pdo, $_SESSION['user_id'], 'Updated Faculty', "Updated faculty: $name ($code)");
+
+    log_activity($_SESSION['user_id'], 'Updated Faculty', "Updated faculty: $name ($code)");
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

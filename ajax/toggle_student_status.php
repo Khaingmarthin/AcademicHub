@@ -36,7 +36,7 @@ try {
         $stmt->execute(['id' => $id]);
         $username = $stmt->fetchColumn();
         
-        logActivity($pdo, $_SESSION['user_id'], 'Status Change', "Changed status of student $username to $status");
+        log_activity($_SESSION['user_id'], 'Status Change', "Changed status of student $username to $status");
         
         echo json_encode(['success' => true, 'message' => "Student status updated to $status."]);
     } else {

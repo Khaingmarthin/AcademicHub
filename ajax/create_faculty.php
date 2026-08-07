@@ -19,8 +19,6 @@ if (!verify_csrf_token($csrf_token)) {
 
 $name = trim($_POST['name'] ?? '');
 $code = trim($_POST['code'] ?? '');
-$type = trim($_POST['type'] ?? 'Academic Faculty');
-$status = trim($_POST['status'] ?? 'Active');
 $vision = trim($_POST['vision'] ?? '');
 $mission = trim($_POST['mission'] ?? '');
 $description = trim($_POST['description'] ?? '');
@@ -39,18 +37,17 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO faculties (faculty_name, faculty_code, faculty_type, vision, mission, description, status) VALUES (:name, :code, :type, :vision, :mission, :desc, :status)");
+    $stmt = $pdo->prepare("INSERT INTO faculties (faculty_name, faculty_code, vision, mission, description) VALUES (:name, :code, :vision, :mission, :desc)");
     $stmt->execute([
         'name' => $name,
         'code' => $code,
-        'type' => $type,
         'vision' => $vision,
         'mission' => $mission,
-        'desc' => $description,
-        'status' => $status
+        'desc' => $description
     ]);
 
-    logActivity($pdo, $_SESSION['user_id'], 'Created Faculty', "Created new faculty: $name ($code)");
+
+    log_activity($_SESSION['user_id'], 'Created Faculty', "Created new faculty: $name ($code)");
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

@@ -60,13 +60,7 @@ if (!$announcement) {
                     <?php endif; ?>
                 </dd>
             </div>
-            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-gray-500">Publish Schedule</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    Publish: <span class="font-semibold"><?php echo $announcement['publish_date'] ? date('M d, Y H:i:s', strtotime($announcement['publish_date'])) : 'Immediate'; ?></span> <br>
-                    Expire: <span class="font-semibold"><?php echo $announcement['expire_date'] ? date('M d, Y H:i:s', strtotime($announcement['expire_date'])) : 'Never'; ?></span>
-                </dd>
-            </div>
+
             <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-gray-500">Status</dt>
                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 capitalize">

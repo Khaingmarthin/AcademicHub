@@ -50,21 +50,14 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/sidebar.php'; ?>
 <?php include '../includes/navbar.php'; ?>
 
-<style>
-.modal-enter { opacity: 0; transform: scale(0.95); }
-.modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
-.modal-leave { opacity: 1; transform: scale(1); }
-.modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
-</style>
-
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         
         <!-- Page Header -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Student Management</h1>
-                <p class="mt-2 text-sm text-gray-500 font-medium">Manage student accounts and classroom assignments.</p>
+                <p class="mt-2 text-sm text-gray-600 font-medium">Manage registered students for the current academic year.</p>
             </div>
             
             <div class="flex gap-2">
@@ -89,349 +82,637 @@ $csrf_token = generate_csrf_token();
                 </div>
             </div>
 
-            <!-- Toolbar -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
-                
-                <div class="flex flex-col md:flex-row w-full xl:w-auto gap-4 flex-1">
-                    <!-- Search Bar -->
-                    <div class="relative w-full md:w-64">
+            <!-- Toolbar & Filters -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <div class="flex flex-col xl:flex-row gap-4 w-full">
+                    
+                    <!-- Search Input -->
+                    <div class="relative w-full xl:w-96 flex-shrink-0">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                         </div>
-                        <input type="text" id="filter_search" placeholder="Search students..." 
-                            class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] sm:text-sm font-medium transition-all duration-200 text-gray-800">
+                        <input type="text" id="filter_search" placeholder="Search by Roll Number, Name or Email..." 
+                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
                     </div>
                     
-                    <!-- Filters -->
-                    <div class="grid grid-cols-2 lg:flex gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
-                        <select id="filter_ay" class="block w-full lg:w-36 py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Academic Years</option>
-                            <?php foreach ($academic_years as $ay): ?>
-                            <option value="<?php echo $ay['id']; ?>" <?php echo $ay['id'] == $active_ay_id ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($ay['year_name']); ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="filter_major" class="block w-full lg:w-36 py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Majors</option>
-                            <?php foreach ($majors as $m): ?>
-                            <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="filter_year" class="block w-full lg:w-32 py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Years</option>
-                            <?php foreach ($year_levels as $yl): ?>
-                            <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="filter_classroom" class="block w-full lg:w-36 py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Classrooms</option>
-                            <!-- Populated via JS based on above filters if needed, or just all classrooms -->
-                            <?php foreach ($classrooms_all as $cl): ?>
-                            <option value="<?php echo $cl['id']; ?>" data-major="<?php echo $cl['major_id']; ?>" data-ay="<?php echo $cl['academic_year_id']; ?>" data-year="<?php echo $cl['academic_year_level_id']; ?>"><?php echo htmlspecialchars($cl['classroom_name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="filter_status" class="block w-full lg:w-32 py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Statuses</option>
-                            <option value="Active">Active</option>
-                            <option value="Suspended">Suspended</option>
-                            <option value="Inactive">Inactive</option>
-                            <option value="Graduated">Graduated</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <button onclick="openAddModal()" class="w-full xl:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm hover:shadow-md transition-all duration-200">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Add Student
-                </button>
-            </div>
+                    <!-- Dropdown Filters -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-1 w-full">
+                        <div class="relative w-full">
+                            <select id="filter_year" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                                <option value="">Year Level</option>
+                                <?php foreach ($year_levels as $yl): ?>
+                                <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                        </div>
+                        
+                        <div class="relative w-full">
+                            <select id="filter_major" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                                <option value="">Major</option>
+                                <?php foreach ($majors as $m): ?>
+                                <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                        </div>
 
-            <!-- Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="student_grid">
-                <?php foreach ($students as $s): 
-                    $initials = strtoupper(substr($s['username'], 0, 1));
-                    $status_color = 'bg-gray-50 text-gray-700 border-gray-200';
-                    if ($s['status'] === 'Active') $status_color = 'bg-green-50 text-green-700 border-green-200';
-                    if ($s['status'] === 'Suspended') $status_color = 'bg-red-50 text-red-700 border-red-200';
-                    if ($s['status'] === 'Graduated') $status_color = 'bg-purple-50 text-purple-700 border-purple-200';
-                    if ($s['status'] === 'Inactive') $status_color = 'bg-gray-100 text-gray-500 border-gray-200';
-                ?>
-                <div class="student-card group relative flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300" 
-                     data-search="<?php echo strtolower(htmlspecialchars($s['username'] . ' ' . $s['student_id'] . ' ' . $s['email'] . ' ' . $s['classroom_name'])); ?>"
-                     data-ay="<?php echo $s['academic_year_id']; ?>"
-                     data-major="<?php echo $s['major_id']; ?>"
-                     data-year="<?php echo $s['academic_year_level_id']; ?>"
-                     data-classroom="<?php echo $s['classroom_id']; ?>"
-                     data-status="<?php echo htmlspecialchars($s['status']); ?>">
-                    
-                    <div class="p-5 flex-1 flex flex-col">
-                        <!-- Header / Status -->
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black tracking-widest bg-blue-50 text-[#2563EB] border border-blue-100">
-                                <?php echo htmlspecialchars($s['student_id'] ?: 'NO ID'); ?>
-                            </span>
-                            
-                            <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border <?php echo $status_color; ?>">
-                                <?php echo htmlspecialchars($s['status']); ?>
-                            </span>
+                        <div class="relative w-full">
+                            <select id="filter_classroom" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                                <option value="">Classroom</option>
+                                <?php foreach ($classrooms_all as $cl): ?>
+                                <option value="<?php echo $cl['id']; ?>" data-major="<?php echo $cl['major_id']; ?>" data-ay="<?php echo $cl['academic_year_id']; ?>" data-year="<?php echo $cl['academic_year_level_id']; ?>"><?php echo htmlspecialchars($cl['classroom_name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                         </div>
                         
-                        <!-- Profile -->
-                        <div class="flex items-center gap-4 mb-5">
-                            <?php if (!empty($s['avatar'])): ?>
-                                <img src="../<?php echo htmlspecialchars($s['avatar']); ?>" class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm">
-                            <?php else: ?>
-                                <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-sm border-2 border-white">
-                                    <?php echo $initials; ?>
-                                </div>
-                            <?php endif; ?>
-                            <div class="flex-1 overflow-hidden">
-                                <h3 class="text-lg font-bold text-gray-900 truncate"><?php echo htmlspecialchars($s['username']); ?></h3>
-                                <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($s['email']); ?></p>
-                            </div>
-                        </div>
-                        
-                        <!-- Badges Grid -->
-                        <div class="grid grid-cols-2 gap-2 mb-4 text-xs font-semibold">
-                            <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 flex items-center gap-2">
-                                <i data-lucide="book-open" class="w-3.5 h-3.5 text-indigo-500"></i>
-                                <span class="truncate text-gray-700"><?php echo htmlspecialchars($s['major'] ?: 'N/A'); ?></span>
-                            </div>
-                            <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 flex items-center gap-2">
-                                <i data-lucide="layout-template" class="w-3.5 h-3.5 text-blue-500"></i>
-                                <span class="truncate text-gray-700"><?php echo htmlspecialchars($s['classroom_name'] ?: 'No Class'); ?></span>
-                            </div>
-                            <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 flex items-center gap-2 col-span-2">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-500"></i>
-                                <span class="truncate text-gray-700">AY: <?php echo htmlspecialchars($s['academic_year'] ?: 'N/A'); ?></span>
-                            </div>
-                        </div>
-                        
-                        <!-- Last Login -->
-                        <div class="mt-auto text-[10px] font-medium text-gray-400 flex items-center justify-between border-t border-gray-50 pt-2">
-                            <span>Last Login: <?php echo $s['last_login'] ? date('M d, Y H:i', strtotime($s['last_login'])) : 'Never'; ?></span>
-                        </div>
+                        <!-- Hidden filters -->
+                        <input type="hidden" id="filter_ay" value="">
+                        <input type="hidden" id="filter_status" value="">
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div class="bg-gray-50/50 border-t border-gray-100 p-2 grid grid-cols-4 gap-1">
-                        <button onclick='viewStudent(<?php echo json_encode($s); ?>)' class="flex flex-col items-center justify-center py-2 rounded-lg text-[#2563EB] hover:bg-blue-50 transition-colors text-[10px] font-bold">
-                            <i data-lucide="eye" class="w-4 h-4 mb-1"></i> View
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
+                        <button id="btn_search_filter" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                            <i data-lucide="search" class="w-4 h-4"></i> Search
                         </button>
-                        <button onclick='openEditModal(<?php echo json_encode($s); ?>)' class="flex flex-col items-center justify-center py-2 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors text-[10px] font-bold">
-                            <i data-lucide="pencil" class="w-4 h-4 mb-1"></i> Edit
+                        <button id="btn_reset_filter" class="w-full sm:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
                         </button>
-                        <button onclick="requestPasswordReset(<?php echo $s['id']; ?>, '<?php echo addslashes($s['username']); ?>')" class="flex flex-col items-center justify-center py-2 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors text-[10px] font-bold">
-                            <i data-lucide="key-round" class="w-4 h-4 mb-1"></i> Reset
+                        <div class="hidden xl:block w-px h-8 bg-gray-200 mx-1 self-center"></div>
+                        <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add Student
                         </button>
-                        <?php if ($s['status'] === 'Active'): ?>
-                        <button onclick="requestToggleStatus(<?php echo $s['id']; ?>, 'Suspended')" class="flex flex-col items-center justify-center py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors text-[10px] font-bold">
-                            <i data-lucide="ban" class="w-4 h-4 mb-1"></i> Suspend
-                        </button>
-                        <?php else: ?>
-                        <button onclick="requestToggleStatus(<?php echo $s['id']; ?>, 'Active')" class="flex flex-col items-center justify-center py-2 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors text-[10px] font-bold">
-                            <i data-lucide="check-circle" class="w-4 h-4 mb-1"></i> Activate
-                        </button>
-                        <?php endif; ?>
                     </div>
                 </div>
-                <?php endforeach; ?>
+            </div>
+
+            <!-- Student List Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50/50 border-b border-gray-100">
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap cursor-pointer hover:bg-gray-200 transition-colors select-none group" onclick="sortTable('roll')">
+                                    <div class="flex items-center gap-1">Roll Number <i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors"></i></div>
+                                </th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap cursor-pointer hover:bg-gray-200 transition-colors select-none group" onclick="sortTable('name')">
+                                    <div class="flex items-center gap-1">Student Name <i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors"></i></div>
+                                </th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Email</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Password</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Year Level</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Major</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Classroom / Section</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 text-right whitespace-nowrap">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student_grid" class="divide-y divide-gray-100">
+                            <?php foreach ($students as $s): 
+                                $initials = strtoupper(substr($s['username'], 0, 1));
+                            ?>
+                            <tr class="student-card hover:bg-gray-50 transition-colors group"
+                                data-search="<?php echo strtolower(htmlspecialchars($s['username'] . ' ' . $s['student_id'] . ' ' . $s['roll_number'] . ' ' . $s['email'] . ' ' . $s['classroom_name'])); ?>"
+                                data-ay="<?php echo $s['academic_year_id']; ?>"
+                                data-major="<?php echo $s['major_id']; ?>"
+                                data-year="<?php echo $s['academic_year_level_id']; ?>"
+                                data-classroom="<?php echo $s['classroom_id']; ?>"
+                                data-status="<?php echo htmlspecialchars($s['status']); ?>"
+                                data-sid="<?php echo htmlspecialchars($s['student_id']); ?>"
+                                data-roll="<?php echo htmlspecialchars($s['roll_number']); ?>"
+                                data-name="<?php echo htmlspecialchars($s['username']); ?>">
+                                
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                    <?php echo htmlspecialchars($s['roll_number'] ?: 'N/A'); ?>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <?php if (!empty($s['avatar'])): ?>
+                                            <img src="../<?php echo htmlspecialchars($s['avatar']); ?>" class="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm">
+                                        <?php else: ?>
+                                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-sm border border-gray-200">
+                                                <?php echo $initials; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="font-bold text-gray-900 text-sm"><?php echo htmlspecialchars($s['username']); ?></div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                    <?php echo htmlspecialchars($s['email']); ?>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-400 font-mono whitespace-nowrap tracking-[0.2em]">
+                                    ••••••••
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                    <?php echo htmlspecialchars($s['year_level'] ?: 'N/A'); ?>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                    <?php echo htmlspecialchars($s['major'] ?: 'N/A'); ?>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                                    <?php echo htmlspecialchars($s['classroom_name'] ?: 'No Class'); ?>
+                                </td>
+                                <td class="px-6 py-4 text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onclick='viewStudent(<?php echo json_encode($s); ?>)' class="p-2 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors" title="View">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick='openEditModal(<?php echo json_encode($s); ?>)' class="p-2 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors" title="Edit">
+                                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="requestDeleteStudent(<?php echo $s['id']; ?>, '<?php echo addslashes($s['username']); ?>')" class="p-2 rounded-lg text-red-600 hover:bg-red-100 transition-colors" title="Delete">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Table Footer (Pagination) -->
+                <div id="table_pagination" class="bg-white px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 hidden">
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <div id="pagination_info">Showing <span class="font-bold text-gray-900">0</span> to <span class="font-bold text-gray-900">0</span> of <span class="font-bold text-gray-900">0</span> students</div>
+                        <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
+                        <div class="flex items-center gap-2">
+                            <label for="rows_per_page">Rows per page:</label>
+                            <select id="rows_per_page" class="border border-gray-200 rounded-lg text-sm py-1 pl-2 pr-6 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] cursor-pointer outline-none">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-1" id="pagination_controls">
+                        <!-- Pagination buttons generated via JS -->
+                    </div>
+                </div>
             </div>
 
             <!-- Empty State -->
-            <div id="search_empty_state" class="hidden flex-col items-center justify-center py-20 px-4 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
-                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                    <i data-lucide="users" class="w-8 h-8 text-gray-400"></i>
+            <div id="search_empty_state" class="hidden flex-col items-center justify-center min-h-[400px] py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100 text-center mt-6">
+                <!-- Friendly Illustration -->
+                <div class="mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-100 rounded-full blur-xl opacity-60"></div>
+                    <div class="w-24 h-24 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center relative z-10 mx-auto">
+                        <i data-lucide="search-x" class="w-10 h-10 text-[#2563EB]"></i>
+                    </div>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-1">No students found</h3>
-                <p class="text-sm text-gray-500">Try adjusting your search or filters.</p>
+                
+                <!-- Text Content -->
+                <h3 class="text-xl font-bold text-gray-900 mb-2">No Students Found</h3>
+                <p class="text-base text-gray-500 mb-8 max-w-sm">No students match your search criteria.</p>
+                
+                <!-- Action Button -->
+                <button onclick="document.getElementById('btn_reset_filter').click()" class="inline-flex items-center justify-center px-6 py-2.5 rounded-xl border border-transparent bg-[#2563EB] text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] transition-colors gap-2 shadow-sm">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    Clear Filters
+                </button>
             </div>
             
             <?php if (count($students) === 0): ?>
-            <div class="flex flex-col items-center justify-center py-20 px-4 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
-                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                    <i data-lucide="users" class="w-8 h-8 text-gray-400"></i>
+            <div class="flex flex-col items-center justify-center min-h-[400px] py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100 text-center mt-6">
+                <div class="mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-100 rounded-full blur-xl opacity-60"></div>
+                    <div class="w-24 h-24 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center relative z-10 mx-auto">
+                        <i data-lucide="users" class="w-10 h-10 text-[#2563EB]"></i>
+                    </div>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-1">No students enrolled yet.</h3>
-                <p class="text-sm text-gray-500">Start by adding a new student or importing from CSV.</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">No Students Enrolled</h3>
+                <p class="text-base text-gray-500 mb-8 max-w-sm">Start by adding a new student to your academic hub.</p>
+                <button onclick="openAddModal()" class="inline-flex items-center justify-center px-6 py-2.5 rounded-xl border border-transparent bg-[#2563EB] text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] transition-colors gap-2 shadow-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    Add Student
+                </button>
             </div>
             <?php endif; ?>
 
         </div>
-    </div>
-</div>
-
-<!-- Add/Edit Modal -->
-<div id="modal_form" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal('modal_form')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
-            <form id="form_student" onsubmit="submitStudent(event)">
-                <input type="hidden" id="form_id" name="id">
-                <div class="bg-white px-6 pt-6 pb-4 border-b border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                            <i id="form_icon" data-lucide="plus" class="w-5 h-5 text-[#2563EB]"></i>
-                        </div>
-                        <h3 class="text-xl leading-6 font-bold text-gray-900" id="form_title">Add Student</h3>
-                    </div>
-                </div>
-                
-                <div class="bg-white px-6 py-6 max-h-[60vh] overflow-y-auto hide-scrollbar space-y-6">
-                    <!-- Personal Info -->
-                    <div>
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Personal Information</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Student ID <span class="text-red-500">*</span></label>
-                                <input type="text" id="form_student_id" name="student_id" required placeholder="e.g. 1CS-01" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Full Name <span class="text-red-500">*</span></label>
-                                <input type="text" id="form_username" name="username" required placeholder="John Doe" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Email Address <span class="text-red-500">*</span></label>
-                                <input type="email" id="form_email" name="email" required placeholder="john@student.edu" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Phone Number</label>
-                                <input type="text" id="form_phone" name="phone" placeholder="09xxxxxxxxx" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Gender</label>
-                                <div class="relative">
-                                    <select id="form_gender" name="gender" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                                        <option value="">Select Gender</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Date of Birth</label>
-                                <input type="date" id="form_dob" name="date_of_birth" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Academic Info -->
-                    <div>
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Academic Information</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Classroom <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <select id="form_classroom_id" name="classroom_id" required class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                                        <option value="">Select Classroom...</option>
-                                        <?php foreach ($classrooms_all as $cl): ?>
-                                        <option value="<?php echo $cl['id']; ?>"><?php echo htmlspecialchars($cl['classroom_name']); ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <select id="form_status" name="status" required class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                                        <option value="Active">Active</option>
-                                        <option value="Suspended">Suspended</option>
-                                        <option value="Inactive">Inactive</option>
-                                        <option value="Graduated">Graduated</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Password Info (Only on Create) -->
-                    <div id="password_section">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Security</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Password <span class="text-red-500">*</span></label>
-                                <input type="password" id="form_password" name="password" minlength="6" placeholder="******" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Confirm Password <span class="text-red-500">*</span></label>
-                                <input type="password" id="form_password_confirm" name="password_confirm" minlength="6" placeholder="******" class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse rounded-b-2xl">
-                    <button type="submit" id="btn_submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-2.5 bg-[#2563EB] text-base font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                        Save Student
-                    </button>
-                    <button type="button" onclick="closeModal('modal_form')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-200 shadow-sm px-6 py-2.5 bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                        Cancel
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
 
-<!-- View Modal -->
-<div id="modal_view" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal('modal_view')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl w-full">
-            <div class="bg-white px-6 pt-6 pb-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 class="text-xl leading-6 font-bold text-gray-900">Student Profile</h3>
-                <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border" id="view_status_badge">Active</span>
-            </div>
-            <div class="px-6 py-6 space-y-6">
-                <div class="flex items-center gap-4">
-                    <div id="view_avatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl shadow-sm border-2 border-white"></div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-gray-900" id="view_name">Name</h3>
-                        <p class="text-sm font-medium text-blue-600" id="view_id">ID</p>
+<!-- Edit Drawer -->
+<div id="modal_edit" class="fixed inset-0 z-50 hidden" aria-labelledby="drawer-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal('modal_edit')"></div>
+    
+    <div class="fixed inset-y-0 right-0 max-w-2xl w-full bg-[#F8FAFC] shadow-2xl flex flex-col overflow-y-auto border-l border-gray-100 animate-slide-in-right">
+        
+        <div class="bg-white px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <i data-lucide="pencil" class="w-5 h-5 text-gray-500"></i>
+                Edit Student Profile
+            </h3>
+            <button type="button" onclick="closeModal('modal_edit')" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="form_edit_student" onsubmit="submitEditStudent(event)" class="flex-1 flex flex-col">
+            <input type="hidden" id="edit_id" name="id">
+            
+            <div class="p-6 space-y-8 flex-1">
+                <!-- Section 1: Personal Information -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">1</span>
+                        Personal Information
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Student ID (Read-only)</label>
+                            <input type="text" id="edit_student_id" name="student_id" disabled class="block w-full px-3 py-2 border border-gray-200 bg-gray-100 rounded-lg text-sm font-medium text-gray-500 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Roll Number <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_roll_number" name="roll_number" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_roll_number">Roll Number is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Student Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_username" name="username" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_username">Student Name is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                            <input type="email" id="edit_email" name="email" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_email">Valid Email is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone Number</label>
+                            <input type="text" id="edit_phone" name="phone" placeholder="09xxxxxxxxx" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                        </div>
                     </div>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+
+                <!-- Section 2: Academic Information -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">2</span>
+                        Academic Information
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Academic Year <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="edit_academic_year" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer" onchange="filterEditClassrooms()">
+                                    <option value="">Select Academic Year...</option>
+                                    <?php foreach ($academic_years as $ay): ?>
+                                    <option value="<?php echo $ay['id']; ?>"><?php echo htmlspecialchars($ay['year_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_academic_year">Academic Year is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Year Level <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="edit_year" name="academic_year_level_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer" onchange="filterEditClassrooms()">
+                                    <option value="">Select Year Level...</option>
+                                    <?php foreach ($year_levels as $yl): ?>
+                                    <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_year">Year Level is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Major <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="edit_major" name="major_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer" onchange="filterEditClassrooms()">
+                                    <option value="">Select Major...</option>
+                                    <?php foreach ($majors as $m): ?>
+                                    <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_major">Major is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Classroom <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="edit_classroom_id" name="classroom_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer">
+                                    <option value="">Select Classroom...</option>
+                                    <?php foreach ($classrooms_all as $cl): ?>
+                                    <option value="<?php echo $cl['id']; ?>" data-ay="<?php echo $cl['academic_year_id']; ?>" data-major="<?php echo $cl['major_id']; ?>" data-year="<?php echo $cl['academic_year_level_id']; ?>">
+                                        <?php echo htmlspecialchars($cl['classroom_name']); ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_classroom_id">Classroom is required.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Account -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">3</span>
+                        Account Information
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Username <span class="text-gray-400 font-normal ml-1">(Optional override)</span></label>
+                            <input type="text" id="edit_account_username" name="account_username" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">New Password <span class="text-gray-400 font-normal ml-1">(Leave blank to keep current)</span></label>
+                            <div class="relative">
+                                <input type="password" id="edit_password" name="password" placeholder="******" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors pr-10">
+                                <button type="button" onclick="togglePasswordVisibility('edit_password', 'icon_edit_pass')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i id="icon_edit_pass" data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_password">Password must be at least 6 characters.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Confirm New Password</label>
+                            <div class="relative">
+                                <input type="password" id="edit_password_confirm" name="password_confirm" placeholder="******" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors pr-10">
+                                <button type="button" onclick="togglePasswordVisibility('edit_password_confirm', 'icon_edit_pass_conf')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i id="icon_edit_pass_conf" data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_edit_password_confirm">Passwords do not match.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 mt-auto">
+                <button type="button" onclick="closeModal('modal_edit')" class="px-6 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" id="btn_submit_edit" class="px-6 py-2.5 rounded-xl border border-transparent bg-[#2563EB] text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] transition-colors flex items-center gap-2 shadow-sm">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Student Drawer -->
+<div id="modal_form" class="fixed inset-0 z-50 hidden" aria-labelledby="drawer-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal('modal_form')"></div>
+    
+    <div class="fixed inset-y-0 right-0 max-w-2xl w-full bg-[#F8FAFC] shadow-2xl flex flex-col overflow-y-auto border-l border-gray-100 animate-slide-in-right">
+        
+        <div class="bg-white px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2" id="form_title">
+                <i id="form_icon" data-lucide="user-plus" class="w-5 h-5 text-gray-500"></i>
+                Add Student
+            </h3>
+            <button type="button" onclick="closeModal('modal_form')" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="form_student" onsubmit="validateAndSubmitStudent(event)" class="flex-1 flex flex-col">
+            <div class="p-6 space-y-8 flex-1">
+                <!-- Section 1: Student Information -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">1</span>
+                        Student Information
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Roll Number <span class="text-red-500">*</span></label>
+                            <input type="text" id="add_roll_number" name="roll_number" placeholder="e.g. 1CS-023" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_roll_number">Roll Number is required.</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="add_username" name="username" placeholder="Student Full Name" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_username">Full Name is required.</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                            <input type="email" id="add_email" name="email" placeholder="student@example.com" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors">
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_email">Valid Email is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Password <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <input type="password" id="add_password" name="password" placeholder="******" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors pr-10">
+                                <button type="button" onclick="togglePasswordVisibility('add_password', 'icon_add_pass')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i id="icon_add_pass" data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_password">Password must be at least 6 characters.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Confirm Password <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <input type="password" id="add_password_confirm" name="password_confirm" placeholder="******" class="block w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors pr-10">
+                                <button type="button" onclick="togglePasswordVisibility('add_password_confirm', 'icon_add_pass_conf')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i id="icon_add_pass_conf" data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_password_confirm">Passwords must match.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Academic Information -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">2</span>
+                        Academic Information
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Academic Year <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="add_academic_year" name="academic_year_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer" onchange="filterAddClassrooms()">
+                                    <option value="">Select Academic Year...</option>
+                                    <?php foreach ($academic_years as $ay): ?>
+                                    <option value="<?php echo $ay['id']; ?>" <?php echo $ay['id'] == $active_ay_id ? 'selected' : ''; ?>><?php echo htmlspecialchars($ay['year_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_academic_year">Academic Year is required.</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Year Level <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="add_year_level" name="academic_year_level_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer" onchange="filterAddClassrooms()">
+                                    <option value="">Select Year Level...</option>
+                                    <?php foreach ($year_levels as $yl): ?>
+                                    <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_year_level">Year Level is required.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Major <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="add_major" name="major_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer" onchange="filterAddClassrooms()">
+                                    <option value="">Select Major...</option>
+                                    <?php foreach ($majors as $m): ?>
+                                    <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_major">Major is required.</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Classroom / Section <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="add_classroom_id" name="classroom_id" class="block w-full py-2 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-900 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors appearance-none cursor-pointer">
+                                    <option value="">Select Classroom...</option>
+                                    <?php foreach ($classrooms_all as $cl): ?>
+                                    <option value="<?php echo $cl['id']; ?>" data-ay="<?php echo $cl['academic_year_id']; ?>" data-major="<?php echo $cl['major_id']; ?>" data-year="<?php echo $cl['academic_year_level_id']; ?>">
+                                        <?php echo htmlspecialchars($cl['classroom_name']); ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                            </div>
+                            <p class="text-red-500 text-[11px] mt-1 hidden" id="err_add_classroom_id">Classroom is required.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 mt-auto">
+                <button type="button" onclick="closeModal('modal_form')" class="px-6 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" id="btn_submit_add" class="px-6 py-2.5 rounded-xl border border-transparent bg-[#2563EB] text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] transition-colors flex items-center gap-2 shadow-sm">
+                    Create Student
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- View Drawer -->
+<div id="modal_view" class="fixed inset-0 z-50 hidden" aria-labelledby="drawer-title" role="dialog" aria-modal="true">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal('modal_view')"></div>
+    
+    <!-- Drawer Panel -->
+    <div class="fixed inset-y-0 right-0 max-w-md w-full bg-[#F8FAFC] shadow-2xl flex flex-col overflow-y-auto border-l border-gray-100 animate-slide-in-right">
+        
+        <!-- Header -->
+        <div class="bg-white px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <i data-lucide="user" class="w-5 h-5 text-gray-500"></i>
+                Student Profile
+            </h3>
+            <button type="button" onclick="closeModal('modal_view')" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-6 flex-1">
+            <!-- Top Avatar/Header inside drawer -->
+            <div class="flex items-center gap-4 mb-2">
+                <div id="view_avatar" class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl shadow-sm border-2 border-white flex-shrink-0"></div>
+                <div class="overflow-hidden">
+                    <h3 class="text-xl font-bold text-gray-900 truncate" id="view_name">Name</h3>
+                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-widest bg-blue-50 text-[#2563EB] border border-blue-100" id="view_id">ID</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border" id="view_status_badge">Active</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Personal Information -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Personal Information</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4">
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Student ID</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_student_id_val">-</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Roll Number</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_roll_number_val">-</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Full Name</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_fullname_val">-</span>
+                    </div>
+                    <div class="sm:col-span-2">
                         <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Email</span>
                         <span class="text-sm font-semibold text-gray-900" id="view_email">-</span>
                     </div>
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phone</span>
+                    <div class="sm:col-span-2">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phone Number</span>
                         <span class="text-sm font-semibold text-gray-900" id="view_phone">-</span>
                     </div>
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Gender</span>
-                        <span class="text-sm font-semibold text-gray-900" id="view_gender">-</span>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date of Birth</span>
-                        <span class="text-sm font-semibold text-gray-900" id="view_dob">-</span>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 col-span-2">
-                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Classroom / Major / AY</span>
-                        <span class="text-sm font-semibold text-gray-900" id="view_academic">-</span>
-                    </div>
-                </div>
-                
-                <div class="text-xs font-medium text-gray-400 text-center">
-                    Last Login: <span id="view_last_login">-</span> | Created: <span id="view_created">-</span>
                 </div>
             </div>
-            <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse rounded-b-2xl">
-                <button type="button" onclick="closeModal('modal_view')" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-2.5 bg-gray-900 text-base font-bold text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 sm:w-auto sm:text-sm transition-colors">
-                    Close
-                </button>
+
+            <!-- Academic Information -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Academic Information</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4">
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Year Level</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_year_level">-</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Major</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_major">-</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Classroom / Section</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_classroom">-</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- Account Information -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Account Information</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4">
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Username</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_username">-</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Created Date</span>
+                        <span class="text-sm font-semibold text-gray-900" id="view_created">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white px-6 py-4 border-t border-gray-100 sm:flex sm:flex-row-reverse sticky bottom-0 mt-auto">
+            <button type="button" onclick="closeModal('modal_view')" class="w-full inline-flex justify-center rounded-xl border border-gray-200 shadow-sm px-6 py-2 bg-white text-base font-bold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:w-auto sm:text-sm transition-colors">
+                Close
+            </button>
         </div>
     </div>
 </div>
+<style>
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+</style>
 
 <!-- Import Modal -->
 <div id="modal_import" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -506,6 +787,38 @@ $csrf_token = generate_csrf_token();
 </div>
 
 <!-- Scripts for layout and filtering (Modal interactions and AJAX to be implemented) -->
+<!-- Delete Confirmation Modal -->
+<div id="modal_delete" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal('modal_delete')"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i data-lucide="alert-triangle" class="h-6 w-6 text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Delete Student</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">Are you sure you want to permanently delete this student?</p>
+                            <p class="text-sm text-gray-500 font-semibold mt-1">This action cannot be undone.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
+                <button type="button" id="btn_confirm_delete" onclick="confirmDeleteStudent()" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors flex items-center gap-2">
+                    Delete Student
+                </button>
+                <button type="button" onclick="closeModal('modal_delete')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-200 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 const csrfToken = '<?php echo $csrf_token; ?>';
 
@@ -513,15 +826,21 @@ function openModal(id) {
     const el = document.getElementById(id);
     el.classList.remove('hidden');
     setTimeout(() => {
-        el.querySelector('div.inline-block').classList.remove('scale-95', 'opacity-0');
-        el.querySelector('div.inline-block').classList.add('scale-100', 'opacity-100');
+        const inner = el.querySelector('div.inline-block');
+        if (inner) {
+            inner.classList.remove('scale-95', 'opacity-0');
+            inner.classList.add('scale-100', 'opacity-100');
+        }
     }, 10);
 }
 
 function closeModal(id) {
     const el = document.getElementById(id);
-    el.querySelector('div.inline-block').classList.remove('scale-100', 'opacity-100');
-    el.querySelector('div.inline-block').classList.add('scale-95', 'opacity-0');
+    const inner = el.querySelector('div.inline-block');
+    if (inner) {
+        inner.classList.remove('scale-100', 'opacity-100');
+        inner.classList.add('scale-95', 'opacity-0');
+    }
     setTimeout(() => {
         el.classList.add('hidden');
     }, 200);
@@ -530,6 +849,10 @@ function closeModal(id) {
 document.querySelectorAll('.inline-block.align-bottom').forEach(el => {
     el.classList.add('scale-95', 'opacity-0', 'transition-all', 'duration-200');
 });
+
+let currentPage = 1;
+let rowsPerPage = 10;
+let filteredStudents = [];
 
 function applyFilters() {
     if (!document.getElementById('filter_search')) return;
@@ -541,8 +864,8 @@ function applyFilters() {
     const classroomFilter = document.getElementById('filter_classroom').value;
     const statusFilter = document.getElementById('filter_status').value;
     
-    const cards = document.querySelectorAll('.student-card');
-    let visibleCount = 0;
+    const cards = Array.from(document.querySelectorAll('.student-card'));
+    filteredStudents = [];
     
     cards.forEach(card => {
         const searchData = card.getAttribute('data-search');
@@ -561,20 +884,74 @@ function applyFilters() {
         if (statusFilter && statusData !== statusFilter) match = false;
         
         if (match) {
-            card.classList.remove('hidden');
-            visibleCount++;
+            filteredStudents.push(card);
         } else {
             card.classList.add('hidden');
         }
     });
     
-    if (visibleCount === 0 && cards.length > 0) {
+    currentPage = 1;
+    renderPagination();
+}
+
+function renderPagination() {
+    const total = filteredStudents.length;
+    
+    if (total === 0) {
         document.getElementById('search_empty_state').classList.remove('hidden');
         document.getElementById('search_empty_state').classList.add('flex');
-    } else {
-        document.getElementById('search_empty_state').classList.add('hidden');
-        document.getElementById('search_empty_state').classList.remove('flex');
+        document.getElementById('table_pagination').classList.add('hidden');
+        return;
     }
+    
+    document.getElementById('search_empty_state').classList.add('hidden');
+    document.getElementById('search_empty_state').classList.remove('flex');
+    document.getElementById('table_pagination').classList.remove('hidden');
+    
+    const totalPages = Math.ceil(total / rowsPerPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+    
+    const startIdx = (currentPage - 1) * rowsPerPage;
+    const endIdx = Math.min(startIdx + rowsPerPage, total);
+    
+    filteredStudents.forEach((card, idx) => {
+        if (idx >= startIdx && idx < endIdx) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+    
+    document.getElementById('pagination_info').innerHTML = `Showing <span class="font-bold text-gray-900">${startIdx + 1}</span>–<span class="font-bold text-gray-900">${endIdx}</span> of <span class="font-bold text-gray-900">${total}</span> students`;
+    
+    let html = '';
+    
+    // Prev
+    html += `<button onclick="changePage(${currentPage - 1})" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed bg-gray-50' : 'text-gray-600 hover:bg-gray-50'} transition-colors" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+    
+    // Page Numbers
+    for (let i = 1; i <= totalPages; i++) {
+        if (totalPages > 7) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                html += `<button onclick="changePage(${i})" class="w-8 h-8 rounded-lg text-sm font-medium flex items-center justify-center transition-colors ${currentPage === i ? 'bg-[#2563EB] text-white border border-[#2563EB]' : 'text-gray-600 border border-gray-200 hover:bg-gray-50'}">${i}</button>`;
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                html += `<span class="px-1 text-gray-400">...</span>`;
+            }
+        } else {
+            html += `<button onclick="changePage(${i})" class="w-8 h-8 rounded-lg text-sm font-medium flex items-center justify-center transition-colors ${currentPage === i ? 'bg-[#2563EB] text-white border border-[#2563EB]' : 'text-gray-600 border border-gray-200 hover:bg-gray-50'}">${i}</button>`;
+        }
+    }
+    
+    // Next
+    html += `<button onclick="changePage(${currentPage + 1})" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed bg-gray-50' : 'text-gray-600 hover:bg-gray-50'} transition-colors" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+    
+    document.getElementById('pagination_controls').innerHTML = html;
+}
+
+function changePage(page) {
+    if (page < 1) return;
+    currentPage = page;
+    renderPagination();
 }
 
 document.getElementById('filter_search').addEventListener('input', applyFilters);
@@ -584,59 +961,325 @@ document.getElementById('filter_year').addEventListener('change', applyFilters);
 document.getElementById('filter_classroom').addEventListener('change', applyFilters);
 document.getElementById('filter_status').addEventListener('change', applyFilters);
 
-document.addEventListener('DOMContentLoaded', applyFilters);
+document.getElementById('btn_search_filter').addEventListener('click', applyFilters);
+document.getElementById('btn_reset_filter').addEventListener('click', () => {
+    document.getElementById('filter_search').value = '';
+    document.getElementById('filter_ay').value = '';
+    document.getElementById('filter_year').value = '';
+    document.getElementById('filter_major').value = '';
+    document.getElementById('filter_classroom').value = '';
+    document.getElementById('filter_status').value = '';
+    applyFilters();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const rowsSelect = document.getElementById('rows_per_page');
+    if (rowsSelect) {
+        rowsSelect.addEventListener('change', (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderPagination();
+        });
+    }
+    applyFilters();
+});
 
 // Add logic for modals and CRUD operations below (to be implemented)
 function openAddModal() {
-    document.getElementById('form_title').textContent = 'Add Student';
-    document.getElementById('form_id').value = '';
-    document.getElementById('form_student').reset();
-    document.getElementById('form_student_id').disabled = false;
-    document.getElementById('password_section').classList.remove('hidden');
-    document.getElementById('form_password').required = true;
-    document.getElementById('form_password_confirm').required = true;
-    openModal('modal_form');
+    try {
+        const form = document.getElementById('form_student');
+        if(form) form.reset();
+        
+        // Clear validation errors
+        document.querySelectorAll('[id^="err_add_"]').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('#form_student input, #form_student select').forEach(el => el.classList.remove('border-red-500'));
+        
+        filterAddClassrooms();
+        openModal('modal_form');
+    } catch(err) {
+        console.error("Error opening Add Student modal:", err);
+        alert("Could not open modal. Check console for details.");
+    }
+}
+
+function filterAddClassrooms() {
+    const ayId = document.getElementById('add_academic_year').value;
+    const yearId = document.getElementById('add_year_level').value;
+    const majorId = document.getElementById('add_major').value;
+    const select = document.getElementById('add_classroom_id');
+    const options = select.querySelectorAll('option[data-major]');
+    
+    let hasMatch = false;
+    options.forEach(opt => {
+        const optAy = opt.getAttribute('data-ay');
+        const optYear = opt.getAttribute('data-year');
+        const optMajor = opt.getAttribute('data-major');
+        
+        let show = true;
+        if (ayId && optAy !== ayId) show = false;
+        if (yearId && optYear !== yearId) show = false;
+        if (majorId && optMajor !== majorId) show = false;
+        
+        if (show) {
+            opt.style.display = '';
+            hasMatch = true;
+        } else {
+            opt.style.display = 'none';
+        }
+    });
+    
+    if (select.value) {
+        const selectedOpt = select.querySelector(`option[value="${select.value}"]`);
+        if (selectedOpt && selectedOpt.style.display === 'none') {
+            select.value = '';
+        }
+    }
+}
+
+async function validateAndSubmitStudent(e) {
+    e.preventDefault();
+    
+    let isValid = true;
+    
+    document.querySelectorAll('[id^="err_add_"]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('#form_student input, #form_student select').forEach(el => el.classList.remove('border-red-500'));
+    
+    const showError = (id) => {
+        const errEl = document.getElementById('err_' + id);
+        if (errEl) errEl.classList.remove('hidden');
+        const inputEl = document.getElementById(id);
+        if (inputEl) inputEl.classList.add('border-red-500');
+        isValid = false;
+    };
+    
+    const rollNumber = document.getElementById('add_roll_number').value.trim();
+    if(!rollNumber) showError('add_roll_number');
+    
+    const username = document.getElementById('add_username').value.trim();
+    if(!username) showError('add_username');
+    
+    const email = document.getElementById('add_email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!email || !emailRegex.test(email)) showError('add_email');
+    
+    if(!document.getElementById('add_academic_year').value) showError('add_academic_year');
+    if(!document.getElementById('add_year_level').value) showError('add_year_level');
+    if(!document.getElementById('add_major').value) showError('add_major');
+    if(!document.getElementById('add_classroom_id').value) showError('add_classroom_id');
+    
+    const pass = document.getElementById('add_password').value;
+    if(pass.length < 6) showError('add_password');
+    
+    const passConf = document.getElementById('add_password_confirm').value;
+    if(pass !== passConf || !passConf) showError('add_password_confirm');
+    
+    if(!isValid) return;
+
+    const btn = document.getElementById('btn_submit_add');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin"></i> Creating...`;
+    btn.disabled = true;
+    lucide.createIcons();
+    
+    const formData = new FormData(e.target);
+    const params = new URLSearchParams();
+    for (const pair of formData) {
+        params.append(pair[0], pair[1]);
+    }
+    params.append('csrf_token', csrfToken);
+    
+    try {
+        const res = await fetch('../ajax/create_student.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        });
+        const data = await res.json();
+        if(data.success) {
+            showSuccess('Student created successfully!');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch(err) {
+        alert('An unexpected error occurred.');
+    } finally {
+        if(btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+        lucide.createIcons();
+    }
+}
+
+function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === "password") {
+        input.type = "text";
+        icon.setAttribute('data-lucide', 'eye-off');
+    } else {
+        input.type = "password";
+        icon.setAttribute('data-lucide', 'eye');
+    }
+    lucide.createIcons();
 }
 
 function openEditModal(student) {
-    document.getElementById('form_title').textContent = 'Edit Student';
-    document.getElementById('form_id').value = student.id;
-    document.getElementById('form_student_id').value = student.student_id || '';
-    document.getElementById('form_student_id').disabled = true; // Cannot edit student ID
-    document.getElementById('form_username').value = student.username || '';
-    document.getElementById('form_email').value = student.email || '';
-    document.getElementById('form_phone').value = student.phone || '';
-    document.getElementById('form_gender').value = student.gender || '';
-    document.getElementById('form_dob').value = student.date_of_birth || '';
-    document.getElementById('form_classroom_id').value = student.classroom_id || '';
-    document.getElementById('form_status').value = student.status;
+    document.getElementById('edit_id').value = student.id;
+    document.getElementById('edit_student_id').value = student.student_id || '';
+    document.getElementById('edit_roll_number').value = student.roll_number || '';
+    document.getElementById('edit_username').value = student.username || '';
+    document.getElementById('edit_email').value = student.email || '';
+    document.getElementById('edit_phone').value = student.phone || '';
     
-    document.getElementById('password_section').classList.add('hidden');
-    document.getElementById('form_password').required = false;
-    document.getElementById('form_password_confirm').required = false;
+    document.getElementById('edit_academic_year').value = student.academic_year_id || '';
+    document.getElementById('edit_year').value = student.academic_year_level_id || '';
+    document.getElementById('edit_major').value = student.major_id || '';
     
-    openModal('modal_form');
+    document.getElementById('edit_account_username').value = student.username || '';
+    document.getElementById('edit_password').value = '';
+    document.getElementById('edit_password_confirm').value = '';
+    
+    document.querySelectorAll('[id^="err_edit_"]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('#form_edit_student input, #form_edit_student select').forEach(el => el.classList.remove('border-red-500'));
+    
+    filterEditClassrooms();
+    document.getElementById('edit_classroom_id').value = student.classroom_id || '';
+    
+    openModal('modal_edit');
+}
+
+function filterEditClassrooms() {
+    const ayId = document.getElementById('edit_academic_year').value;
+    const yearId = document.getElementById('edit_year').value;
+    const majorId = document.getElementById('edit_major').value;
+    const select = document.getElementById('edit_classroom_id');
+    const options = select.querySelectorAll('option[data-major]');
+    
+    let hasMatch = false;
+    options.forEach(opt => {
+        const optAy = opt.getAttribute('data-ay');
+        const optYear = opt.getAttribute('data-year');
+        const optMajor = opt.getAttribute('data-major');
+        let show = true;
+        if (ayId && optAy !== ayId) show = false;
+        if (yearId && optYear !== yearId) show = false;
+        if (majorId && optMajor !== majorId) show = false;
+        
+        if (show) {
+            opt.style.display = '';
+            hasMatch = true;
+        } else {
+            opt.style.display = 'none';
+        }
+    });
+    
+    if (select.value) {
+        const selectedOpt = select.querySelector(`option[value="${select.value}"]`);
+        if (selectedOpt && selectedOpt.style.display === 'none') {
+            select.value = '';
+        }
+    }
+}
+
+async function submitEditStudent(e) {
+    e.preventDefault();
+    
+    let isValid = true;
+    document.querySelectorAll('[id^="err_edit_"]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('#form_edit_student input, #form_edit_student select').forEach(el => el.classList.remove('border-red-500'));
+    
+    const showError = (id) => {
+        document.getElementById('err_' + id).classList.remove('hidden');
+        document.getElementById(id).classList.add('border-red-500');
+        isValid = false;
+    };
+    
+    const rollNumber = document.getElementById('edit_roll_number').value.trim();
+    if(!rollNumber) showError('edit_roll_number');
+
+    const username = document.getElementById('edit_username').value.trim();
+    if(!username) showError('edit_username');
+    
+    const email = document.getElementById('edit_email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!email || !emailRegex.test(email)) showError('edit_email');
+    
+    if(!document.getElementById('edit_classroom_id').value) showError('edit_classroom_id');
+    
+    const pass = document.getElementById('edit_password').value;
+    const passConf = document.getElementById('edit_password_confirm').value;
+    
+    if(pass) {
+        if(pass.length < 6) showError('edit_password');
+        if(pass !== passConf) showError('edit_password_confirm');
+    }
+    
+    if(!isValid) return;
+
+    const btn = document.getElementById('btn_submit_edit');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin"></i> Saving...`;
+    btn.disabled = true;
+    lucide.createIcons();
+    
+    const formData = new FormData(e.target);
+    const params = new URLSearchParams();
+    for (const pair of formData) {
+        params.append(pair[0], pair[1]);
+    }
+    params.append('csrf_token', csrfToken);
+    
+    try {
+        const res = await fetch('../ajax/update_student.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        });
+        const data = await res.json();
+        if(data.success) {
+            closeModal('modal_edit');
+            showSuccess('Student profile updated successfully!');
+        } else {
+            alert('Error: ' + data.message);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+    } catch(err) {
+        alert('An unexpected error occurred.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        lucide.createIcons();
+    }
 }
 
 function viewStudent(s) {
     document.getElementById('view_name').textContent = s.username;
+    document.getElementById('view_fullname_val').textContent = s.username;
+    document.getElementById('view_username').textContent = s.username;
+    
     document.getElementById('view_id').textContent = s.student_id || 'NO ID';
+    document.getElementById('view_student_id_val').textContent = s.student_id || 'N/A';
+    document.getElementById('view_roll_number_val').textContent = s.roll_number || 'N/A';
+    
     document.getElementById('view_email').textContent = s.email;
     document.getElementById('view_phone').textContent = s.phone || 'N/A';
-    document.getElementById('view_gender').textContent = s.gender || 'N/A';
-    document.getElementById('view_dob').textContent = s.date_of_birth || 'N/A';
-    document.getElementById('view_academic').textContent = `${s.classroom_name || 'N/A'} / ${s.major || 'N/A'} / ${s.academic_year || 'N/A'}`;
-    document.getElementById('view_last_login').textContent = s.last_login ? s.last_login : 'Never';
+    
+    document.getElementById('view_year_level').textContent = s.year_level || 'N/A';
+    document.getElementById('view_major').textContent = s.major || 'N/A';
+    document.getElementById('view_classroom').textContent = s.classroom_name || 'N/A';
+    
     document.getElementById('view_created').textContent = s.created_at;
     
     document.getElementById('view_avatar').textContent = s.username.charAt(0).toUpperCase();
     
     const badge = document.getElementById('view_status_badge');
     badge.textContent = s.status;
-    if (s.status === 'Active') badge.className = 'inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-green-50 text-green-700 border-green-200';
-    else if (s.status === 'Suspended') badge.className = 'inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-red-50 text-red-700 border-red-200';
-    else if (s.status === 'Graduated') badge.className = 'inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-purple-50 text-purple-700 border-purple-200';
-    else badge.className = 'inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-gray-100 text-gray-500 border-gray-200';
+    if (s.status === 'Active') badge.className = 'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border bg-green-50 text-green-700 border-green-200';
+    else if (s.status === 'Suspended') badge.className = 'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border bg-red-50 text-red-700 border-red-200';
+    else if (s.status === 'Graduated') badge.className = 'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border bg-purple-50 text-purple-700 border-purple-200';
+    else badge.className = 'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border bg-gray-100 text-gray-500 border-gray-200';
     
     openModal('modal_view');
 }
@@ -702,6 +1345,46 @@ async function requestToggleStatus(id, newStatus) {
         }
     } catch(err) {
         alert('An unexpected error occurred.');
+    }
+}
+
+let deleteStudentId = null;
+
+function requestDeleteStudent(id, name) {
+    deleteStudentId = id;
+    openModal('modal_delete');
+}
+
+async function confirmDeleteStudent() {
+    if (!deleteStudentId) return;
+    
+    const btn = document.getElementById('btn_confirm_delete');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin"></i> Deleting...`;
+    btn.disabled = true;
+    lucide.createIcons();
+    
+    try {
+        const res = await fetch('../ajax/delete_student.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${deleteStudentId}&csrf_token=${csrfToken}`
+        });
+        const data = await res.json();
+        if(data.success) {
+            closeModal('modal_delete');
+            showSuccess(data.message || 'Student deleted successfully.');
+        } else {
+            alert('Error: ' + data.message);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+    } catch(err) {
+        alert('An unexpected error occurred.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        lucide.createIcons();
     }
 }
 
@@ -799,6 +1482,30 @@ function showSuccess(msg) {
     setTimeout(() => {
         window.location.reload();
     }, 1500);
+}
+
+let sortState = { col: null, dir: 'asc' };
+function sortTable(col) {
+    const grid = document.getElementById('student_grid');
+    const rows = Array.from(grid.querySelectorAll('tr.student-card'));
+    
+    if (sortState.col === col) {
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortState.col = col;
+        sortState.dir = 'asc';
+    }
+
+    rows.sort((a, b) => {
+        let valA = (a.getAttribute('data-' + col) || '').toLowerCase();
+        let valB = (b.getAttribute('data-' + col) || '').toLowerCase();
+        
+        if (valA < valB) return sortState.dir === 'asc' ? -1 : 1;
+        if (valA > valB) return sortState.dir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    rows.forEach(row => grid.appendChild(row));
 }
 </script>
 

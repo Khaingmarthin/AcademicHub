@@ -18,6 +18,10 @@ if (!verify_csrf_token($csrf_token)) {
 }
 
 $student_id = trim($_POST['student_id'] ?? '');
+if (empty($student_id)) {
+    $student_id = 'STU-' . strtoupper(uniqid());
+}
+$roll_number = trim($_POST['roll_number'] ?? '');
 $username = trim($_POST['username'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $phone = trim($_POST['phone'] ?? '');
@@ -28,7 +32,7 @@ $status = trim($_POST['status'] ?? 'Active');
 $password = $_POST['password'] ?? '';
 $password_confirm = $_POST['password_confirm'] ?? '';
 
-if (empty($student_id) || empty($username) || empty($email) || empty($classroom_id) || empty($password)) {
+if (empty($student_id) || empty($roll_number) || empty($username) || empty($email) || empty($classroom_id) || empty($password)) {
     echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);
     exit;
 }
@@ -60,13 +64,22 @@ try {
         exit;
     }
 
+    // Check duplicate roll_number
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE roll_number = :roll");
+    $stmt->execute(['roll' => $roll_number]);
+    if ($stmt->fetch()) {
+        echo json_encode(['success' => false, 'message' => 'Roll Number is already in use.']);
+        exit;
+    }
+
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $dob_val = empty($dob) ? null : $dob;
     
-    $stmt = $pdo->prepare("INSERT INTO users (student_id, classroom_id, username, email, password, role, status, phone, gender, date_of_birth) VALUES (:sid, :cid, :uname, :email, :pass, 'student', :status, :phone, :gender, :dob)");
+    $stmt = $pdo->prepare("INSERT INTO users (student_id, roll_number, classroom_id, username, email, password, role, status, phone, gender, date_of_birth) VALUES (:sid, :roll, :cid, :uname, :email, :pass, 'student', :status, :phone, :gender, :dob)");
     
     $stmt->execute([
         'sid' => $student_id,
+        'roll' => $roll_number,
         'cid' => $classroom_id,
         'uname' => $username,
         'email' => $email,
@@ -83,7 +96,7 @@ try {
     $stmt = $pdo->prepare("INSERT INTO notification_settings (user_id) VALUES (:uid)");
     $stmt->execute(['uid' => $new_user_id]);
 
-    logActivity($pdo, $_SESSION['user_id'], 'Created Student', "Created student account for $username ($student_id)");
+    log_activity($_SESSION['user_id'], 'Created Student', "Created student account for $username ($student_id)");
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

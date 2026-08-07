@@ -133,7 +133,7 @@ if ($active_ay_id > 0 && $current_semester !== 'none') {
                     <p class="mt-1 text-gray-500">Your timetable for this semester has not been uploaded yet.</p>
                 </div>
             <?php else: ?>
-                <div class="bg-gray-800 rounded-lg overflow-hidden shadow-inner flex flex-col" style="height: 700px;">
+                <div class="bg-gray-800 rounded-lg overflow-hidden shadow-inner flex flex-col h-[700px]">
                     <div class="bg-gray-900 px-4 py-2 flex justify-between items-center text-gray-400 text-sm">
                         <span>Timetable Preview</span>
                         <span>Uploaded: <?php echo date('M d, Y h:i A', strtotime($timetable['created_at'])); ?></span>

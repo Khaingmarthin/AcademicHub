@@ -60,169 +60,212 @@ $is_auth_page = true;
 include '../includes/header.php'; 
 ?>
 
-<!-- Main Container -->
-<div class="min-h-screen w-full flex items-center justify-center font-sans relative overflow-hidden" style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 25%, #BFDBFE 55%, #93C5FD 100%);">
-    
-    <!-- Background Blurred Circles -->
-    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#60A5FA] opacity-20 rounded-full blur-[100px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#818CF8] opacity-15 rounded-full blur-[100px] pointer-events-none"></div>
+<!-- ========== LOGIN PAGE ========== -->
+<div class="flex h-screen w-screen bg-slate-50 font-sans overflow-hidden">
+    <!-- ===== LEFT HERO SECTION ===== -->
+    <div class="relative hidden lg:flex lg:w-[55%] items-center justify-center overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-400">
+        <!-- Floating Abstract Shapes -->
+        <div class="absolute -top-10 -right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl mix-blend-overlay"></div>
+        <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-blue-300/20 rounded-full blur-3xl mix-blend-overlay"></div>
+        <div class="absolute top-1/3 left-1/4 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
 
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full max-w-6xl animate-fade-in-up">
-        <div class="flex flex-col lg:flex-row items-center justify-center lg:justify-between w-full h-full min-h-[calc(100vh-4rem)] py-8 gap-8 lg:gap-12">
-            
-            <!-- Left Side (Illustration) -->
-            <div class="hidden lg:flex flex-col w-[45%] text-left">
-                <div class="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transform transition-transform hover:scale-[1.02] duration-500 border border-white/30">
-                    <img src="<?php echo htmlspecialchars(base_url('/assets/images/ucsmtla2.jpg')); ?>" alt="Academic Campus" class="w-full h-full object-cover">
-                    <!-- Subtle dark gradient at the bottom for text readability -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/20 to-transparent"></div>
-                    <div class="absolute bottom-8 left-8 right-8 text-white">
-                        <h3 class="text-3xl font-bold mb-3 leading-tight text-white drop-shadow-md">Stay Connected with<br>Campus Announcements.</h3>
-                        <p class="text-blue-100 text-lg font-medium drop-shadow-sm">Your central hub for academic excellence at UCSMTLA.</p>
+        <!-- Hero Content -->
+        <div class="relative z-10 text-white text-center px-10 max-w-lg">
+            <!-- University Logo -->
+            <div class="w-20 h-20 mx-auto mb-6 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
+                <img src="<?php echo htmlspecialchars(base_url('/assets/images/ucsmtla%20logo.png')); ?>" alt="UCSMTLA Logo" class="w-16 h-16 object-contain drop-shadow-md">
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2 drop-shadow-lg">UCSMTLA Academic Hub</h1>
+            <p class="text-lg font-medium text-white/90 mb-1">Smart Digital Announcement Platform</p>
+            <p class="text-sm font-light text-white/70 mb-10">University of Computer Studies (Meiktila)</p>
+
+            <!-- Feature Cards -->
+            <div class="flex flex-col gap-4 mb-10 text-left">
+                <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 transition hover:bg-white/20">
+                    <div class="p-3 bg-white/20 rounded-lg">
+                        <i data-lucide="bell" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Real-time Announcements</h3>
+                        <p class="text-xs text-white/80">Stay updated with the latest campus news</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 transition hover:bg-white/20">
+                    <div class="p-3 bg-white/20 rounded-lg">
+                        <i data-lucide="calendar" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Academic Timetables</h3>
+                        <p class="text-xs text-white/80">Access your class schedules anytime</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 transition hover:bg-white/20">
+                    <div class="p-3 bg-white/20 rounded-lg">
+                        <i data-lucide="info" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Campus Information</h3>
+                        <p class="text-xs text-white/80">Everything you need in one place</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Side (Login Card) -->
-            <div class="w-full lg:w-[55%] flex justify-center lg:justify-end">
-                <div class="w-full max-w-[460px] bg-white/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/50 animate-slide-up">
-                    
-                    <!-- Header -->
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center p-2.5 mb-4 transition-transform duration-300 hover:scale-105">
-                            <img src="<?php echo htmlspecialchars(base_url('/assets/images/ucsmtla%20logo.png')); ?>" alt="UCSMTLA Logo" class="w-full h-full object-contain">
+            <!-- Footer -->
+            <p class="text-xs text-white/60">&copy; 2026 University of Computer Studies (Meiktila)</p>
+        </div>
+    </div>
+
+    <!-- ===== RIGHT LOGIN SECTION ===== -->
+    <div class="flex-1 flex items-center justify-center p-6 lg:p-12 relative animate-fade-in">
+        <!-- Mobile Logo (shows only on small screens) -->
+        <div class="absolute top-8 left-8 lg:hidden flex items-center gap-3">
+            <img src="<?php echo htmlspecialchars(base_url('/assets/images/ucsmtla%20logo.png')); ?>" alt="Logo" class="w-10 h-10">
+            <span class="font-bold text-gray-800">UCSMTLA</span>
+        </div>
+
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 p-8 sm:p-10 relative z-10">
+            
+            <!-- Logo in Card for Mobile -->
+            <div class="flex flex-col items-center mb-8 lg:hidden">
+                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-3 border border-blue-100">
+                    <img src="<?php echo htmlspecialchars(base_url('/assets/images/ucsmtla%20logo.png')); ?>" alt="UCSMTLA Logo" class="w-10 h-10 object-contain">
+                </div>
+                <h2 class="text-xl font-bold text-gray-900">UCSMTLA Academic Hub</h2>
+                <span class="mt-1 px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full tracking-wider">ADMINISTRATOR LOGIN</span>
+            </div>
+
+            <!-- Heading -->
+            <div class="mb-8 hidden lg:block">
+                <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full tracking-wider mb-4">ADMINISTRATOR LOGIN</span>
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Welcome Back</h1>
+                <p class="text-sm text-gray-500 leading-relaxed">Sign in with your administrator account to access the Academic Hub Management System.</p>
+            </div>
+
+            <!-- Flash Messages -->
+            <div class="mb-6">
+                <?php display_flash_messages(); ?>
+            </div>
+
+            <!-- Form -->
+            <form action="login.php" method="POST" class="space-y-5" id="loginForm">
+                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
                         </div>
-                        <h1 class="text-[22px] font-bold text-[#1E293B] mb-1">UCSMTLA Academic Hub</h1>
-                       
-                        <h2 class="text-2xl font-light text-[#1E293B] mb-2 tracking-wide">Welcome Back</h2>
+                        <input id="email" name="email" type="email" required
+                            class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50/50 text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors sm:text-sm"
+                            placeholder="admin@ucsmtla.edu.mm"
+                            value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                     </div>
+                </div>
 
-                    <!-- Flash Messages -->
-                    <div class="mb-6">
-                        <?php display_flash_messages(); ?>
-                    </div>
-
-                    <!-- Form -->
-                    <form action="login.php" method="POST" class="space-y-4">
-                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
-                        
-                        <!-- Email -->
-                        <div class="space-y-1.5 text-left">
-                            <label for="email" class="block text-sm font-semibold text-[#1E293B]">Email Address</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#64748B] group-focus-within:text-[#2563EB] transition-colors">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
-                                </div>
-                                <input id="email" name="email" type="email" required
-                                    class="block w-full h-[48px] pl-11 pr-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-xl text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] focus:bg-white transition-all duration-300 p-3"
-                                    placeholder="Enter your email"
-                                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-                            </div>
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
                         </div>
-
-                        <!-- Password -->
-                        <div class="space-y-1.5 text-left">
-                            <label for="password" class="block text-sm font-semibold text-[#1E293B]">Password</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#64748B] group-focus-within:text-[#2563EB] transition-colors">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                </div>
-                                <input id="password" name="password" type="password" required
-                                    class="block w-full h-[48px] pl-11 pr-12 bg-[#F8FAFC] border border-[#E5E7EB] rounded-xl text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] focus:bg-white transition-all duration-300 p-3"
-                                    placeholder="Enter your password">
-                                <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-[#64748B] hover:text-[#1E293B] transition-colors focus:outline-none">
-                                    <svg id="eye-icon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Options -->
-                        <div class="flex items-center justify-between pt-2">
-                            <!-- Checkbox -->
-                            <label class="flex items-center space-x-2.5 cursor-pointer group gap-3">
-                                <div class="relative flex items-center justify-center">
-                                    <input type="checkbox" name="remember" class="peer appearance-none w-4 h-4 border border-[#E5E7EB] rounded bg-[#F8FAFC] checked:bg-[#2563EB] checked:border-[#2563EB] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 focus:ring-offset-1">
-                                    <svg class="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                                </div>
-                                <span class="text-sm font-medium text-[#64748B] group-hover:text-[#1E293B] transition-colors">Remember me</span>
-                            </label>
-                            
-                            <a href="forgot-password.php" class="text-sm font-semibold text-[#2563EB] hover:text-[#4F46E5] hover:underline transition-all">Forgot Password?</a>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="w-full h-[48px] mt-4 bg-gradient-to-r from-[#2563EB] to-[#4F46E5] text-white rounded-xl font-bold text-[15px] shadow-[0_8px_20px_-6px_rgba(37,99,235,0.5)] hover:shadow-[0_12px_24px_-8px_rgba(79,70,229,0.7)] hover:-translate-y-0.5 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] flex items-center justify-center space-x-2 p-3">
-                            <span>Sign In</span>
-                            <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <input id="password" name="password" type="password" required
+                            class="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl bg-gray-50/50 text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors sm:text-sm"
+                            placeholder="••••••••">
+                        <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                            <i data-lucide="eye" id="eye-icon" class="w-5 h-5"></i>
                         </button>
-                    </form>
-                    
-                    <!-- Secondary Button -->
-                    <div class="mt-6 pt-4 border-t border-[#E5E7EB]">
-                        <a href="<?php echo htmlspecialchars(base_url('/public/index.php')); ?>" class="w-full h-[48px] flex items-center justify-center space-x-2 border border-[#E5E7EB] bg-white hover:bg-[#F8FAFC] text-[#64748B] hover:text-[#1E293B] rounded-xl font-semibold text-[15px] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E5E7EB] p-3">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                            <span>Continue as Guest</span>
-                        </a>
                     </div>
                 </div>
+
+                <!-- Remember / Forgot -->
+                <div class="flex items-center justify-between mt-2">
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" name="remember" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                        <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Remember me</span>
+                    </label>
+                    <a href="forgot-password.php" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">Forgot Password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="loginSubmitBtn" class="w-full mt-6 py-3 px-4 flex justify-center items-center gap-2 border border-transparent rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-md shadow-blue-500/20 group">
+                    <span id="loginBtnText">Sign In</span>
+                    <i data-lucide="arrow-right" id="loginBtnArrow" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+                    <i data-lucide="loader-2" id="loginBtnSpinner" class="w-4 h-4 animate-spin hidden"></i>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-8 relative flex items-center">
+                <div class="flex-grow border-t border-gray-200"></div>
+                <span class="flex-shrink-0 mx-4 text-gray-400 text-xs font-semibold uppercase tracking-wider">OR</span>
+                <div class="flex-grow border-t border-gray-200"></div>
             </div>
-            
+
+            <!-- Guest Button -->
+            <a href="<?php echo htmlspecialchars(base_url('/public/index.php')); ?>" class="mt-6 w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors shadow-sm">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                <span>Continue as Guest</span>
+            </a>
+
+            <!-- Footer Help -->
+            <div class="mt-8 text-center">
+                <span class="text-sm text-gray-500">Need help?</span>
+                <a href="<?php echo htmlspecialchars(base_url('/public/contact.php')); ?>" class="text-sm font-medium text-blue-600 hover:text-blue-800 ml-1 transition-colors">Contact the Academic Office</a>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    .animate-fade-in-up {
-        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    .animate-slide-up {
-        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
-        opacity: 0;
-    }
-    
-    /* Ensure autofill matches style */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active {
-        -webkit-box-shadow: 0 0 0 50px #F8FAFC inset !important;
-        -webkit-text-fill-color: #1E293B !important;
-        transition: background-color 5000s ease-in-out 0s;
-    }
-</style>
-
+<!-- ========== SCRIPTS ========== -->
 <script>
-function togglePassword() {
+(function() {
+    'use strict';
+
+    // ─── Password Toggle ───
+    const toggleBtn = document.getElementById('togglePasswordBtn');
     const pwdInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eye-icon');
-    if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
-    } else {
-        pwdInput.type = 'password';
-        eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
     }
-}
+
+    // ─── Form Submit Loading State ───
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    const btnText = document.getElementById('loginBtnText');
+    const btnArrow = document.getElementById('loginBtnArrow');
+    const btnSpinner = document.getElementById('loginBtnSpinner');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            if (btnText) btnText.textContent = 'Signing In...';
+            if (btnArrow) btnArrow.classList.add('hidden');
+            if (btnSpinner) btnSpinner.classList.remove('hidden');
+        });
+    }
+
+    // Render icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+})();
 </script>
 
 <?php include '../includes/footer.php'; ?>

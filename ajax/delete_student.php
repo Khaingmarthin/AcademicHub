@@ -20,29 +20,27 @@ if (!verify_csrf_token($csrf_token)) {
 $id = (int)($_POST['id'] ?? 0);
 
 if ($id <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Invalid timetable ID.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid student ID.']);
     exit;
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT file_path FROM timetables WHERE id = :id");
+    // Get student info for logging
+    $stmt = $pdo->prepare("SELECT username, student_id FROM users WHERE id = :id AND role = 'student'");
     $stmt->execute(['id' => $id]);
-    $timetable = $stmt->fetch();
+    $student = $stmt->fetch();
 
-    if ($timetable) {
-        if (file_exists('../../' . $timetable['file_path'])) {
-            unlink('../../' . $timetable['file_path']);
-        }
-        
-        $stmt = $pdo->prepare("DELETE FROM timetables WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        
-        log_activity($_SESSION['user_id'], 'Deleted Timetable', "Deleted timetable ID: $id");
-        
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Timetable not found.']);
+    if (!$student) {
+        echo json_encode(['success' => false, 'message' => 'Student not found.']);
+        exit;
     }
+
+    $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+
+    log_activity($_SESSION['user_id'], 'Deleted Student', "Deleted student: {$student['username']} ({$student['student_id']})");
+
+    echo json_encode(['success' => true, 'message' => 'Student deleted successfully.']);
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }

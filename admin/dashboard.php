@@ -24,9 +24,7 @@ $stats = [
     'total' => 0,
     'published' => 0,
     'draft' => 0,
-    'archived' => 0,
-    'scheduled' => 0,
-    'expired' => 0
+    'archived' => 0
 ];
 
 // Base conditions for active academic year filtering
@@ -45,11 +43,7 @@ $stats['draft'] = $pdo->query("SELECT COUNT(*) FROM announcements a LEFT JOIN ac
 // Archived (ay status is archived)
 $stats['archived'] = $pdo->query("SELECT COUNT(*) FROM announcements a JOIN academic_years ay ON a.academic_year_id = ay.id WHERE ay.status = 'archived' $ay_condition_a")->fetchColumn();
 
-// Scheduled (publish date in future)
-$stats['scheduled'] = $pdo->query("SELECT COUNT(*) FROM announcements WHERE publish_date > NOW() $ay_condition_raw")->fetchColumn();
 
-// Expired (expire date in past)
-$stats['expired'] = $pdo->query("SELECT COUNT(*) FROM announcements WHERE expire_date IS NOT NULL AND expire_date <= NOW() $ay_condition_raw")->fetchColumn();
 
 // Fetch Latest Announcements joining Categories and counting comments
 $stmt = $pdo->query("SELECT a.id, a.title, a.created_at, a.status, a.is_urgent, a.is_featured, a.publish_date, c.category_name,
@@ -125,7 +119,8 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
 
     <!-- Welcome Card -->
     <?php
-    $hour = (int)date('H');
+    $dt = new DateTime("now", new DateTimeZone('Asia/Yangon'));
+    $hour = (int)$dt->format('H');
     $greeting = 'Good Morning';
     if ($hour >= 12 && $hour < 17) {
         $greeting = 'Good Afternoon';
@@ -191,7 +186,7 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
     </div>
 
     <!-- Statistics Cards Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Total Announcements -->
         <div class="bg-white rounded-xl shadow-sm border-t-4 border-blue-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
@@ -213,7 +208,7 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
             <p class="text-xs font-medium text-gray-400">Published News</p>
         </div>
 
-        <!-- Draft Announcements -->
+    <!-- Draft Announcements -->
         <div class="bg-white rounded-xl shadow-sm border-t-4 border-yellow-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <div class="flex justify-between items-start mb-3">
                 <span class="text-xs font-semibold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">↓ 3% this week</span>
@@ -223,25 +218,16 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
             <p class="text-xs font-medium text-gray-400">Draft Status</p>
         </div>
 
-        <!-- Scheduled Announcements -->
-        <div class="bg-white rounded-xl shadow-sm border-t-4 border-cyan-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <!-- Archived Announcements -->
+        <div class="bg-white rounded-xl shadow-sm border-t-4 border-gray-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <div class="flex justify-between items-start mb-3">
-                <span class="text-xs font-semibold text-cyan-600 bg-cyan-50 px-2 py-1 rounded-md">Future release</span>
-                <i data-lucide="calendar" class="w-5 h-5 text-cyan-500"></i>
+                <span class="text-xs font-semibold text-gray-600 bg-gray-50 px-2 py-1 rounded-md">Archived</span>
+                <i data-lucide="archive" class="w-5 h-5 text-gray-500"></i>
             </div>
-            <h3 class="text-2xl font-black text-gray-800 mb-0.5"><?php echo $stats['scheduled']; ?></h3>
-            <p class="text-xs font-medium text-gray-400">Scheduled Posts</p>
+            <h3 class="text-2xl font-black text-gray-800 mb-0.5"><?php echo $stats['archived']; ?></h3>
+            <p class="text-xs font-medium text-gray-400">Archived Announcements</p>
         </div>
 
-        <!-- Expired Announcements -->
-        <div class="bg-white rounded-xl shadow-sm border-t-4 border-red-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-            <div class="flex justify-between items-start mb-3">
-                <span class="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded-md">Past end date</span>
-                <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
-            </div>
-            <h3 class="text-2xl font-black text-gray-800 mb-0.5"><?php echo $stats['expired']; ?></h3>
-            <p class="text-xs font-medium text-gray-400">Expired Posts</p>
-        </div>
     </div>
 
     <!-- Main Content Layout -->

@@ -58,7 +58,7 @@ try {
 
     $pdo->commit();
 
-    logActivity($pdo, $_SESSION['user_id'], 'Student Batch Action', $logMsg);
+    log_activity($_SESSION['user_id'], 'Student Batch Action', $logMsg);
 
     echo json_encode(['success' => true, 'message' => "Successfully processed $count student(s)."]);
 } catch (PDOException $e) {

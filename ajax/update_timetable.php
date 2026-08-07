@@ -130,7 +130,7 @@ try {
         'id' => $id
     ]);
     
-    logActivity($pdo, $_SESSION['user_id'], 'Updated Timetable', "Updated timetable ID: $id");
+    log_activity($_SESSION['user_id'], 'Updated Timetable', "Updated timetable ID: $id");
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

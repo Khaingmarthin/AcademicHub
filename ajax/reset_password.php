@@ -37,7 +37,7 @@ try {
         $stmt->execute(['id' => $id]);
         $username = $stmt->fetchColumn();
         
-        logActivity($pdo, $_SESSION['user_id'], 'Password Reset', "Reset password for student: $username");
+        log_activity($_SESSION['user_id'], 'Password Reset', "Reset password for student: $username");
         
         echo json_encode([
             'success' => true, 

@@ -69,7 +69,7 @@ function nav_link($href, $icon, $label, $active, $iconColor = 'text-gray-400') {
             <?php echo nav_link('../admin/announcements.php', 'megaphone', 'Announcements', is_active(['announcements.php', 'create_announcement.php', 'edit_announcement.php', 'view_announcement.php']), 'text-orange-500'); ?>
             <?php echo nav_link('../admin/categories.php', 'tag', 'Categories', is_active('categories.php'), 'text-purple-500'); ?>
             
-            <?php echo nav_link('../admin/faculties.php', 'building-2', 'Faculties', is_active('faculties.php'), 'text-yellow-500'); ?>
+            <?php echo nav_link('../admin/faculties.php', 'building-2', 'Faculties', is_active(['faculties.php', 'view_faculty.php']), 'text-yellow-500'); ?>
             <?php echo nav_link('../admin/courses.php', 'book-open', 'Courses', is_active('courses.php'), 'text-indigo-500'); ?>
             <?php echo nav_link('../admin/classrooms.php', 'presentation', 'Classrooms', is_active('classrooms.php'), 'text-emerald-500'); ?>
             

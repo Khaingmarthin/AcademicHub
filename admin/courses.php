@@ -52,38 +52,48 @@ $csrf_token = generate_csrf_token();
             </div>
 
             <!-- Toolbar -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
-                
-                <div class="flex flex-col md:flex-row w-full xl:w-auto gap-4 flex-1">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <div class="flex flex-col xl:flex-row gap-4 w-full">
+                    
                     <!-- Search Bar -->
-                    <div class="relative w-full md:w-64">
+                    <div class="relative w-full xl:w-96 flex-shrink-0">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                         </div>
                         <input type="text" id="filter_search" placeholder="Search by name, code..." 
-                            class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] sm:text-sm font-medium transition-all duration-200 text-gray-800">
+                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
                     </div>
                     
                     <!-- Filters -->
-                    <div class="grid grid-cols-2 md:flex gap-3 w-full md:w-auto">
-                        <select id="filter_faculty" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Faculties</option>
-                            <?php foreach ($faculties as $f): ?>
-                            <option value="<?php echo htmlspecialchars($f['faculty_code']); ?>"><?php echo htmlspecialchars($f['faculty_code']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <select id="filter_major" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                            <option value="">All Majors</option>
-                            <?php foreach ($majors as $m): ?>
-                            <option value="<?php echo htmlspecialchars($m); ?>"><?php echo htmlspecialchars($m); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 w-full">
+                        <div class="relative w-full">
+                            <select id="filter_faculty" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                                <option value="">All Faculties</option>
+                                <?php foreach ($faculties as $f): ?>
+                                <option value="<?php echo htmlspecialchars($f['faculty_code']); ?>"><?php echo htmlspecialchars($f['faculty_code']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                        </div>
+                        
+                        <div class="relative w-full">
+                            <select id="filter_major" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                                <option value="">All Majors</option>
+                                <?php foreach ($majors as $m): ?>
+                                <option value="<?php echo htmlspecialchars($m); ?>"><?php echo htmlspecialchars($m); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
+                        <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add Course
+                        </button>
                     </div>
                 </div>
-                
-                <button onclick="openAddModal()" class="w-full xl:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm hover:shadow-md transition-all duration-200">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Add Course
-                </button>
             </div>
 
             <!-- Year Selection UI -->

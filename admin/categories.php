@@ -21,14 +21,7 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/sidebar.php'; ?>
 <?php include '../includes/navbar.php'; ?>
 
-<!-- Add custom styles if needed, but Tailwind should handle it -->
-<style>
-/* For modal transitions */
-.modal-enter { opacity: 0; transform: scale(0.95); }
-.modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
-.modal-leave { opacity: 1; transform: scale(1); }
-.modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
-</style>
+
 
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
@@ -52,13 +45,16 @@ $csrf_token = generate_csrf_token();
                         <p class="text-sm font-semibold text-green-700">Category updated successfully!</p>
                     </div>
                 </div>
-                <!-- Search Bar -->
-                <div class="relative w-full max-w-md">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                <!-- Toolbar -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
+                    <!-- Search Bar -->
+                    <div class="relative w-full xl:w-96 flex-shrink-0">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                        </div>
+                        <input type="text" id="search_categories" placeholder="Search categories..." 
+                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
                     </div>
-                    <input type="text" id="search_categories" placeholder="Search categories..." 
-                        class="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl leading-5 bg-white shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] sm:text-sm font-medium transition-all duration-200 text-gray-800">
                 </div>
 
                 <!-- Cards Grid -->

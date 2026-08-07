@@ -108,7 +108,7 @@ if (($handle = fopen($file['tmp_name'], "r")) !== FALSE) {
         $pdo->commit();
         
         if ($success_count > 0) {
-            logActivity($pdo, $_SESSION['user_id'], 'Imported Students', "Imported $success_count students via CSV.");
+            log_activity($_SESSION['user_id'], 'Imported Students', "Imported $success_count students via CSV.");
         }
         
         $msg = "Import complete. $success_count imported successfully. $error_count failed.";

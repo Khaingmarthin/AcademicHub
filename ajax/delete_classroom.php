@@ -44,7 +44,7 @@ try {
     $stmt->execute(['id' => $id]);
 
     if ($classroomName) {
-        logActivity($pdo, $_SESSION['user_id'], 'Deleted Classroom', "Deleted classroom: $classroomName");
+        log_activity($_SESSION['user_id'], 'Deleted Classroom', "Deleted classroom: $classroomName");
     }
 
     echo json_encode(['success' => true]);

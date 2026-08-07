@@ -96,7 +96,7 @@ try {
         'status' => $status
     ]);
 
-    logActivity($pdo, $_SESSION['user_id'], 'Created Classroom', "Created new classroom: $classroom_name");
+    log_activity($_SESSION['user_id'], 'Created Classroom', "Created new classroom: $classroom_name");
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

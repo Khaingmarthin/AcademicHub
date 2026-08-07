@@ -19,7 +19,7 @@
   }
   
   .dark input:focus, .dark select:focus, .dark textarea:focus {
-    @apply ring-primary border-primary;
+    @apply ring-primary-500 border-primary-500;
   }
 }
 
@@ -31,13 +31,57 @@
   
   /* Primary Button */
   .btn-primary {
-    @apply bg-[color:var(--primary-color)] hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 active:scale-95;
+    @apply bg-primary hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 active:scale-95;
   }
   
   /* Skeleton Loader */
   .skeleton {
     @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
   }
+
+  /* Admin Layout Transitions */
+  .transition-all-300 {
+    @apply transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)];
+  }
+
+  /* Sidebar structure */
+  .admin-sidebar {
+    @apply w-sidebar-expanded h-screen fixed left-0 top-0 z-40 bg-white border-r border-slate-200 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)];
+  }
+
+  /* Content Area margins */
+  #main-content-wrapper {
+    @apply ml-sidebar-expanded transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)];
+  }
+
+  /* Header position */
+  .admin-header {
+    @apply h-header-height left-sidebar-expanded right-0 !w-auto transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)];
+  }
+
+  /* Chevron rotate rules */
+  html.sidebar-collapsed .sidebar-collapse-chevron {
+    @apply rotate-180;
+  }
+
+  /* Hover scales on icons */
+  .hover-scale-icon:hover {
+    @apply scale-[1.08];
+  }
+
+  /* Slide-over panel (drawer) transitions */
+  .profile-drawer {
+    @apply translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)];
+  }
+  .profile-drawer.open {
+    @apply translate-x-0;
+  }
+
+  /* Modal Transitions */
+  .modal-enter { opacity: 0; transform: scale(0.95); }
+  .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
+  .modal-leave { opacity: 1; transform: scale(1); }
+  .modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
 }
 
 @layer utilities {
@@ -48,5 +92,56 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Collapsed States on Desktop (lg screens and up) */
+  @media (min-width: 1024px) {
+    html.sidebar-collapsed .admin-sidebar {
+      @apply w-sidebar-collapsed;
+    }
+    html.sidebar-collapsed #main-content-wrapper {
+      @apply ml-sidebar-collapsed;
+    }
+    html.sidebar-collapsed .admin-header {
+      @apply left-sidebar-collapsed;
+    }
+  }
+
+  /* Mobile/Tablet sidebar rules */
+  @media (max-width: 1023px) {
+    .admin-sidebar {
+      @apply -translate-x-full !w-sidebar-expanded;
+    }
+    .admin-sidebar.mobile-open {
+      @apply translate-x-0;
+    }
+    #main-content-wrapper {
+      @apply !ml-0;
+    }
+    .admin-header {
+      @apply !left-0;
+    }
+  }
+
+  /* Collapsed utility classes */
+  html.sidebar-collapsed .sidebar-full-content {
+    @apply !hidden;
+  }
+  html.sidebar-collapsed .sidebar-collapsed-content {
+    @apply !block;
+  }
+  html.sidebar-collapsed .sidebar-collapsed-content-flex {
+    @apply !flex;
+  }
+
+  /* Tooltip styles for collapsed state */
+  .sidebar-tooltip {
+    @apply hidden;
+  }
+  html.sidebar-collapsed .sidebar-item-link:hover .sidebar-tooltip {
+    @apply block;
+  }
+  html.sidebar-collapsed .sidebar-item-link {
+    @apply !justify-center !px-0;
   }
 }
