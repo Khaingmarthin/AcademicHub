@@ -5,7 +5,7 @@ require_once '../config/db.php';
 require_once '../config/functions.php';
 
 // Fetch Active Academic Year
-$active_ay_id = $_SESSION['current_academic_year_id'] ?? 0;
+$active_ay_id = get_global_active_academic_year($pdo)['id'] ?? 0;
 if (!$active_ay_id) {
     $stmt = $pdo->query("SELECT id FROM academic_years WHERE status = 'Active' LIMIT 1");
     $active_ay_id = $stmt->fetchColumn() ?: 0;
@@ -50,8 +50,10 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/sidebar.php'; ?>
 <?php include '../includes/navbar.php'; ?>
 
-<div class="min-h-screen bg-[#F8FAFC] pb-12">
-    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+<!-- Table styles use Tailwind auto-layout -->
+
+<div class="min-h-screen bg-[#F8FAFC] pb-12 relative z-0">
+    <div class="w-full px-4 sm:px-6 lg:px-8 pt-8">
         
         <!-- Page Header -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -73,32 +75,31 @@ $csrf_token = generate_csrf_token();
             </div>
         </div>
 
-        <div class="flex flex-col space-y-6">
-            <!-- Success Alert -->
-            <div id="top_success_alert" class="hidden items-center justify-between px-5 py-3 rounded-xl bg-green-50/90 border border-green-200 shadow-sm backdrop-blur-sm transition-all duration-300">
+        <!-- Success Alert -->
+        <div id="top_success_alert" class="hidden items-center justify-between px-5 py-3 rounded-xl bg-green-50/90 border border-green-200 shadow-sm backdrop-blur-sm transition-all duration-300 mb-6">
                 <div class="flex items-center gap-3">
                     <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
                     <p class="text-sm font-semibold text-green-700" id="top_success_message">Success!</p>
                 </div>
             </div>
 
-            <!-- Toolbar & Filters -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
-                <div class="flex flex-col xl:flex-row gap-4 w-full">
+        <!-- Toolbar & Filters -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6 w-full relative z-20">
+                <div class="flex flex-col md:flex-row flex-wrap items-start md:items-center gap-4 w-full">
                     
                     <!-- Search Input -->
-                    <div class="relative w-full xl:w-96 flex-shrink-0">
+                    <div class="relative w-full md:w-[calc(50%-0.5rem)] lg:w-auto lg:flex-1 min-w-[200px]">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                         </div>
                         <input type="text" id="filter_search" placeholder="Search by Roll Number, Name or Email..." 
-                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
+                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
                     </div>
                     
                     <!-- Dropdown Filters -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 flex-1 w-full">
-                        <div class="relative w-full">
-                            <select id="filter_year" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-[calc(50%-0.5rem)] lg:w-auto lg:flex-[1.5] min-w-[250px]">
+                        <div class="relative w-full sm:flex-1 min-w-[120px]">
+                            <select id="filter_year" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
                                 <option value="">Year Level</option>
                                 <?php foreach ($year_levels as $yl): ?>
                                 <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
@@ -107,8 +108,8 @@ $csrf_token = generate_csrf_token();
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                         </div>
                         
-                        <div class="relative w-full">
-                            <select id="filter_major" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                        <div class="relative w-full sm:flex-1 min-w-[120px]">
+                            <select id="filter_major" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
                                 <option value="">Major</option>
                                 <?php foreach ($majors as $m): ?>
                                 <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
@@ -117,8 +118,8 @@ $csrf_token = generate_csrf_token();
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
                         </div>
 
-                        <div class="relative w-full">
-                            <select id="filter_classroom" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
+                        <div class="relative w-full sm:flex-1 min-w-[120px]">
+                            <select id="filter_classroom" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
                                 <option value="">Classroom</option>
                                 <?php foreach ($classrooms_all as $cl): ?>
                                 <option value="<?php echo $cl['id']; ?>" data-major="<?php echo $cl['major_id']; ?>" data-ay="<?php echo $cl['academic_year_id']; ?>" data-year="<?php echo $cl['academic_year_level_id']; ?>"><?php echo htmlspecialchars($cl['classroom_name']); ?></option>
@@ -133,39 +134,39 @@ $csrf_token = generate_csrf_token();
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
-                        <button id="btn_search_filter" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-full lg:w-auto lg:flex-shrink-0 lg:ml-auto mt-2 md:mt-0">
+                        <button id="btn_search_filter" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
                             <i data-lucide="search" class="w-4 h-4"></i> Search
                         </button>
-                        <button id="btn_reset_filter" class="w-full sm:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                        <button id="btn_reset_filter" class="w-full sm:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
                             <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
                         </button>
-                        <div class="hidden xl:block w-px h-8 bg-gray-200 mx-1 self-center"></div>
-                        <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
+                        <div class="hidden lg:block w-px h-8 bg-gray-200 mx-1 self-center"></div>
+                        <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
                             <i data-lucide="plus" class="w-4 h-4"></i> Add Student
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Student List Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+        <!-- Student List Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 w-full mb-6">
+                <div class="w-full rounded-xl">
+                    <table id="student-table" class="w-full text-left border-collapse table-auto md:table-fixed min-w-0">
                         <thead>
                             <tr class="bg-gray-50/50 border-b border-gray-100">
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap cursor-pointer hover:bg-gray-200 transition-colors select-none group" onclick="sortTable('roll')">
-                                    <div class="flex items-center gap-1">Roll Number <i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors"></i></div>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 cursor-pointer hover:bg-gray-200 transition-colors select-none group md:w-[10%]" onclick="sortTable('roll')">
+                                    <div class="flex items-center gap-1">Roll No. <i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors"></i></div>
                                 </th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap cursor-pointer hover:bg-gray-200 transition-colors select-none group" onclick="sortTable('name')">
-                                    <div class="flex items-center gap-1">Student Name <i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors"></i></div>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 cursor-pointer hover:bg-gray-200 transition-colors select-none group md:w-[20%]" onclick="sortTable('name')">
+                                    <div class="flex items-center gap-1">Name <i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors"></i></div>
                                 </th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Email</th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Password</th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Year Level</th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Major</th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 whitespace-nowrap">Classroom / Section</th>
-                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 text-right whitespace-nowrap">Actions</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 md:w-[18%]">Email</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 md:w-[11%]">Academic Year</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 md:w-[10%]">Year Level</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 md:w-[10%]">Major</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 md:w-[11%]">Classroom</th>
+                                <th class="sticky top-0 bg-gray-50/90 backdrop-blur-sm px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider z-10 text-right w-[100px] md:w-[100px]">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="student_grid" class="divide-y divide-gray-100">
@@ -183,38 +184,38 @@ $csrf_token = generate_csrf_token();
                                 data-roll="<?php echo htmlspecialchars($s['roll_number']); ?>"
                                 data-name="<?php echo htmlspecialchars($s['username']); ?>">
                                 
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                <td class="px-2 py-3 text-sm font-medium text-gray-900 truncate" title="<?php echo htmlspecialchars($s['roll_number'] ?: 'N/A'); ?>">
                                     <?php echo htmlspecialchars($s['roll_number'] ?: 'N/A'); ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-3">
+                                <td class="px-2 py-3">
+                                    <div class="flex items-center gap-2 min-w-0">
                                         <?php if (!empty($s['avatar'])): ?>
-                                            <img src="../<?php echo htmlspecialchars($s['avatar']); ?>" class="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm">
+                                            <img src="../<?php echo htmlspecialchars($s['avatar']); ?>" class="w-7 h-7 rounded-full object-cover border border-gray-200 shadow-sm flex-shrink-0">
                                         <?php else: ?>
-                                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-sm border border-gray-200">
+                                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shadow-sm border border-gray-200 flex-shrink-0">
                                                 <?php echo $initials; ?>
                                             </div>
                                         <?php endif; ?>
-                                        <div class="font-bold text-gray-900 text-sm"><?php echo htmlspecialchars($s['username']); ?></div>
+                                        <span class="font-bold text-gray-900 text-sm truncate flex-1" title="<?php echo htmlspecialchars($s['username']); ?>"><?php echo htmlspecialchars($s['username']); ?></span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                <td class="px-2 py-3 text-sm text-gray-500 truncate" title="<?php echo htmlspecialchars($s['email']); ?>">
                                     <?php echo htmlspecialchars($s['email']); ?>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-400 font-mono whitespace-nowrap tracking-[0.2em]">
-                                    ••••••••
+                                <td class="px-2 py-3 text-sm text-gray-600 truncate" title="<?php echo htmlspecialchars($s['academic_year'] ?: 'N/A'); ?>">
+                                    <?php echo htmlspecialchars($s['academic_year'] ?: 'N/A'); ?>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                <td class="px-2 py-3 text-sm text-gray-600 truncate" title="<?php echo htmlspecialchars($s['year_level'] ?: 'N/A'); ?>">
                                     <?php echo htmlspecialchars($s['year_level'] ?: 'N/A'); ?>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                <td class="px-2 py-3 text-sm text-gray-600 truncate" title="<?php echo htmlspecialchars($s['major'] ?: 'N/A'); ?>">
                                     <?php echo htmlspecialchars($s['major'] ?: 'N/A'); ?>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                                <td class="px-2 py-3 text-sm text-gray-600 font-medium truncate" title="<?php echo htmlspecialchars($s['classroom_name'] ?: 'No Class'); ?>">
                                     <?php echo htmlspecialchars($s['classroom_name'] ?: 'No Class'); ?>
                                 </td>
-                                <td class="px-6 py-4 text-right whitespace-nowrap">
-                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <td class="px-2 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-1 transition-opacity">
                                         <button onclick='viewStudent(<?php echo json_encode($s); ?>)' class="p-2 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors" title="View">
                                             <i data-lucide="eye" class="w-4 h-4"></i>
                                         </button>
@@ -233,7 +234,7 @@ $csrf_token = generate_csrf_token();
                 </div>
                 
                 <!-- Table Footer (Pagination) -->
-                <div id="table_pagination" class="bg-white px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 hidden">
+                <div id="table_pagination" class="bg-white rounded-b-xl w-full px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 hidden">
                     <div class="flex items-center gap-4 text-sm text-gray-500">
                         <div id="pagination_info">Showing <span class="font-bold text-gray-900">0</span> to <span class="font-bold text-gray-900">0</span> of <span class="font-bold text-gray-900">0</span> students</div>
                         <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
@@ -255,7 +256,7 @@ $csrf_token = generate_csrf_token();
             </div>
 
             <!-- Empty State -->
-            <div id="search_empty_state" class="hidden flex-col items-center justify-center min-h-[400px] py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100 text-center mt-6">
+        <div id="search_empty_state" class="hidden flex-col items-center justify-center min-h-[400px] py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100 w-full text-center mb-6">
                 <!-- Friendly Illustration -->
                 <div class="mb-6 relative">
                     <div class="absolute inset-0 bg-blue-100 rounded-full blur-xl opacity-60"></div>
@@ -276,7 +277,7 @@ $csrf_token = generate_csrf_token();
             </div>
             
             <?php if (count($students) === 0): ?>
-            <div class="flex flex-col items-center justify-center min-h-[400px] py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100 text-center mt-6">
+        <div class="flex flex-col items-center justify-center min-h-[400px] py-16 px-4 bg-white rounded-xl shadow-sm border border-gray-100 w-full text-center mb-6">
                 <div class="mb-6 relative">
                     <div class="absolute inset-0 bg-blue-100 rounded-full blur-xl opacity-60"></div>
                     <div class="w-24 h-24 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center relative z-10 mx-auto">
@@ -292,8 +293,6 @@ $csrf_token = generate_csrf_token();
             </div>
             <?php endif; ?>
 
-        </div>
-        </div>
     </div>
 </div>
 
@@ -1098,10 +1097,20 @@ async function validateAndSubmitStudent(e) {
         if(data.success) {
             showSuccess('Student created successfully!');
         } else {
-            alert('Error: ' + data.message);
+            if (data.field) {
+                showError(data.field);
+                const errMsgEl = document.getElementById('err_' + data.field);
+                if (errMsgEl) {
+                    errMsgEl.textContent = data.message;
+                    errMsgEl.classList.remove('hidden');
+                }
+            } else {
+                alert('Error: ' + data.message);
+            }
         }
     } catch(err) {
-        alert('An unexpected error occurred.');
+        console.error("Error creating student:", err);
+        alert('An unexpected error occurred: ' + err.message);
     } finally {
         if(btn) {
             btn.innerHTML = originalText;

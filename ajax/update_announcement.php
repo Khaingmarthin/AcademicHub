@@ -21,7 +21,7 @@ $id = (int)($_POST['id'] ?? 0);
 $title = trim($_POST['title'] ?? '');
 $content = trim($_POST['content'] ?? '');
 $category_id = !empty($_POST['category_id']) ? (int)$_POST['category_id'] : null;
-$academic_year_id = !empty($_POST['academic_year_id']) ? (int)$_POST['academic_year_id'] : ($_SESSION['current_academic_year_id'] ?? null);
+$academic_year_id = !empty($_POST['academic_year_id']) ? (int)$_POST['academic_year_id'] : (get_global_active_academic_year($pdo)['id'] ?? null);
 $publish_date = !empty($_POST['publish_date']) ? $_POST['publish_date'] : null;
 $is_urgent = isset($_POST['is_urgent']) ? 1 : 0;
 

@@ -15,7 +15,7 @@ $offset = ($page - 1) * $limit;
 
 $search = $_GET['search'] ?? '';
 $category_id = $_GET['category_id'] ?? '';
-$academic_year_id = $_GET['academic_year_id'] ?? ($_SESSION['current_academic_year_id'] ?? '');
+$academic_year_id = $_GET['academic_year_id'] ?? (get_global_active_academic_year($pdo)['id'] ?? '');
 $status_filter = $_GET['status_filter'] ?? '';
 $date_from = $_GET['date_from'] ?? '';
 $date_to = $_GET['date_to'] ?? '';

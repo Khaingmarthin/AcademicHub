@@ -11,7 +11,10 @@ $ay_count = $stmt_ay->fetchColumn();
 
 $department_count = 5; // Hardcoded as representative value
 ?>
-<?php include '../includes/header.php'; ?>
+<?php 
+$is_public_area = true;
+include '../includes/header.php'; 
+?>
 <?php include '../includes/navbar.php'; ?>
 
 <!-- PAGE HEADER -->

@@ -4,13 +4,23 @@ require_admin();
 require_once '../config/db.php';
 require_once '../config/functions.php';
 
-// Fetch all courses with their associated faculties
-$stmt = $pdo->query("
+$active_ay_id = get_global_active_academic_year($pdo)['id'] ?? 0;
+
+// Fetch current academic year name
+$stmt = $pdo->prepare("SELECT year_name FROM academic_years WHERE id = :id LIMIT 1");
+$stmt->execute(['id' => $active_ay_id]);
+$active_ay = $stmt->fetch();
+$active_ay_name = $active_ay ? $active_ay['year_name'] : 'N/A';
+
+// Fetch all courses for the active academic year with their associated faculties
+$stmt = $pdo->prepare("
     SELECT c.*, f.faculty_name, f.faculty_code 
     FROM courses c 
     LEFT JOIN faculties f ON c.faculty_id = f.id 
+    WHERE c.academic_year_id = :ay_id
     ORDER BY c.year_level ASC, c.major ASC, c.course_code ASC
 ");
+$stmt->execute(['ay_id' => $active_ay_id]);
 $courses = $stmt->fetchAll();
 
 // Fetch faculties for filter and dropdowns
@@ -34,12 +44,12 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/navbar.php'; ?>
 
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8 pt-8">
         
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Course Management</h1>
-            <p class="mt-2 text-sm text-gray-500 font-medium">Manage all university courses and subjects.</p>
+            <p class="mt-2 text-sm text-gray-500 font-medium">Manage courses for academic year <?php echo htmlspecialchars($active_ay_name); ?>.</p>
         </div>
 
         <div class="flex flex-col space-y-6">
@@ -52,84 +62,45 @@ $csrf_token = generate_csrf_token();
             </div>
 
             <!-- Toolbar -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
-                <div class="flex flex-col xl:flex-row gap-4 w-full">
-                    
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
+                
+                <div class="flex flex-col md:flex-row w-full xl:w-auto gap-4 flex-1">
                     <!-- Search Bar -->
-                    <div class="relative w-full xl:w-96 flex-shrink-0">
+                    <div class="relative w-full md:w-64">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                         </div>
                         <input type="text" id="filter_search" placeholder="Search by name, code..." 
-                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
+                            class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] sm:text-sm font-medium transition-all duration-200 text-gray-800">
                     </div>
                     
                     <!-- Filters -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 w-full">
-                        <div class="relative w-full">
-                            <select id="filter_faculty" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
-                                <option value="">All Faculties</option>
-                                <?php foreach ($faculties as $f): ?>
-                                <option value="<?php echo htmlspecialchars($f['faculty_code']); ?>"><?php echo htmlspecialchars($f['faculty_code']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                        </div>
-                        
-                        <div class="relative w-full">
-                            <select id="filter_major" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
-                                <option value="">All Majors</option>
-                                <?php foreach ($majors as $m): ?>
-                                <option value="<?php echo htmlspecialchars($m); ?>"><?php echo htmlspecialchars($m); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
-                        <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Add Course
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Year Selection UI -->
-            <div class="bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] p-8 sm:p-12 rounded-2xl shadow-lg mb-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
-                <!-- Decorative background elements -->
-                <div class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
-                    <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white blur-3xl"></div>
-                    <div class="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-blue-400 blur-3xl"></div>
-                </div>
-                
-                <div class="relative z-10 w-full max-w-2xl mx-auto">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">Manage Courses by Year</h2>
-                    <p class="text-blue-100 mb-8 font-medium text-lg">Select an academic year to instantly view and manage its associated courses.</p>
-                    
-                    <div class="relative w-full max-w-lg mx-auto group">
-                        <select id="main_year_filter" class="block w-full px-6 py-4 border-2 border-transparent bg-white/95 backdrop-blur-md rounded-2xl text-lg font-bold text-gray-800 hover:bg-white focus:bg-white focus:ring-4 focus:ring-white/30 focus:border-white transition-all cursor-pointer appearance-none shadow-xl hover:shadow-2xl outline-none">
-                            <option value="">-- Choose Academic Year --</option>
+                    <div class="grid grid-cols-2 lg:flex lg:flex-nowrap gap-3 w-full xl:w-auto">
+                        <select id="filter_semester" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                            <option value="">All Semesters</option>
+                            <option value="First Semester">First Semester</option>
+                            <option value="Second Semester">Second Semester</option>
+                        </select>
+                        <select id="filter_year_level" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                            <option value="">All Year Levels</option>
                             <?php foreach ($years as $y): ?>
                             <option value="<?php echo htmlspecialchars($y); ?>"><?php echo htmlspecialchars($y); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
-                            <i data-lucide="chevron-down" class="w-6 h-6 text-gray-500 group-focus-within:text-blue-600 transition-colors"></i>
-                        </div>
+                        <select id="filter_major" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                            <option value="">All Majors</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Computer Technology">Computer Technology</option>
+                        </select>
                     </div>
                 </div>
+                
+                <button onclick="openAddModal()" class="w-full xl:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm hover:shadow-md transition-all duration-200">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add Course
+                </button>
             </div>
 
-            <!-- Initial Empty State -->
-            <div id="year_empty_state" class="flex flex-col items-center justify-center py-24 px-4 bg-white rounded-2xl shadow-sm border border-gray-100 text-center">
-                <div class="w-24 h-24 bg-blue-50/50 rounded-full flex items-center justify-center mb-6">
-                    <i data-lucide="book-open" class="w-10 h-10 text-blue-300"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Awaiting Selection</h3>
-                <p class="text-base text-gray-500 font-medium max-w-md mx-auto">Please select an academic year from the dropdown above to display the corresponding courses.</p>
-            </div>
+
 
             <!-- View Course Detail Panel (Hidden by default) -->
             <div id="view_panel" class="hidden">
@@ -330,11 +301,11 @@ $csrf_token = generate_csrf_token();
             </div>
 
             <!-- Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="course_grid" style="display: none;">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="course_grid">
                 <?php foreach ($courses as $c): ?>
                 <div class="course-card group relative flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300" 
                      data-search="<?php echo strtolower(htmlspecialchars($c['course_name'] . ' ' . $c['course_code'])); ?>"
-                     data-faculty="<?php echo htmlspecialchars($c['faculty_code'] ?? ''); ?>"
+                     data-semester="<?php echo htmlspecialchars($c['semester'] ?? ''); ?>"
                      data-major="<?php echo htmlspecialchars($c['major'] ?? ''); ?>"
                      data-year="<?php echo htmlspecialchars($c['year_level'] ?? ''); ?>">
                     
@@ -623,38 +594,25 @@ document.getElementById('btn_confirm_delete').addEventListener('click', async fu
 // Search and Filter Logic
 function applyFilters() {
     const term = document.getElementById('filter_search').value.toLowerCase();
-    const facFilter = document.getElementById('filter_faculty').value;
+    const semesterFilter = document.getElementById('filter_semester').value;
+    const yearLevelFilter = document.getElementById('filter_year_level').value;
     const majorFilter = document.getElementById('filter_major').value;
-    const yearFilter = document.getElementById('main_year_filter').value;
     
     const cards = document.querySelectorAll('.course-card');
-    const courseGrid = document.getElementById('course_grid');
-    const yearEmptyState = document.getElementById('year_empty_state');
     const searchEmptyState = document.getElementById('search_empty_state');
     let visibleCount = 0;
     
-    if (!yearFilter) {
-        courseGrid.style.display = 'none';
-        yearEmptyState.style.display = 'flex';
-        searchEmptyState.classList.add('hidden');
-        searchEmptyState.classList.remove('flex');
-        return;
-    } else {
-        courseGrid.style.display = '';
-        yearEmptyState.style.display = 'none';
-    }
-    
     cards.forEach(card => {
         const searchData = card.getAttribute('data-search');
-        const facData = card.getAttribute('data-faculty');
+        const semesterData = card.getAttribute('data-semester');
+        const yearLevelData = card.getAttribute('data-year');
         const majorData = card.getAttribute('data-major');
-        const yearData = card.getAttribute('data-year');
         
         let match = true;
         if (term && !searchData.includes(term)) match = false;
-        if (facFilter && facData !== facFilter) match = false;
+        if (semesterFilter && semesterData !== semesterFilter) match = false;
+        if (yearLevelFilter && yearLevelData !== yearLevelFilter) match = false;
         if (majorFilter && majorData !== majorFilter) match = false;
-        if (yearFilter && yearData !== yearFilter) match = false;
         
         if (match) {
             card.classList.remove('hidden');
@@ -674,9 +632,9 @@ function applyFilters() {
 }
 
 document.getElementById('filter_search').addEventListener('input', applyFilters);
-document.getElementById('filter_faculty').addEventListener('change', applyFilters);
+document.getElementById('filter_semester').addEventListener('change', applyFilters);
+document.getElementById('filter_year_level').addEventListener('change', applyFilters);
 document.getElementById('filter_major').addEventListener('change', applyFilters);
-document.getElementById('main_year_filter').addEventListener('change', applyFilters);
 
 // Initial call to set state
 applyFilters();

@@ -21,9 +21,13 @@ $admin_codes = ['ADMIN', 'FINANCE', 'STUDENT_AFFAIRS', 'LIBRARY'];
 
 $academic_faculties = [];
 $admin_departments = [];
+$active_count = 0;
 $faculties_data = [];
 
 foreach ($faculties as $fac) {
+    if ($fac['status'] === 'Active') {
+        $active_count++;
+    }
     if (in_array(strtoupper($fac['faculty_code']), $academic_codes)) {
         $academic_faculties[] = $fac;
     } else {
@@ -33,17 +37,24 @@ foreach ($faculties as $fac) {
 $stats = [
     'total' => count($faculties),
     'academic' => count($academic_faculties),
-    'admin' => count($admin_departments)
+    'admin' => count($admin_departments),
+    'active' => $active_count
 ];
 ?>
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/sidebar.php'; ?>
 <?php include '../includes/navbar.php'; ?>
 
-
+<style>
+/* For modal transitions */
+.modal-enter { opacity: 0; transform: scale(0.95); }
+.modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
+.modal-leave { opacity: 1; transform: scale(1); }
+.modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
+</style>
 
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8 pt-8">
         
         <!-- Page Header -->
         <div class="mb-8">
@@ -52,7 +63,7 @@ $stats = [
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Units</p>
@@ -80,6 +91,15 @@ $stats = [
                     <i data-lucide="briefcase" class="w-6 h-6"></i>
                 </div>
             </div>
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Active Units</p>
+                    <h3 class="text-2xl font-black text-gray-800"><?php echo $stats['active']; ?></h3>
+                </div>
+                <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+            </div>
         </div>
 
         <!-- Success Alert -->
@@ -91,20 +111,34 @@ $stats = [
         </div>
 
         <!-- Toolbar -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
-            <div class="relative w-full xl:w-96 flex-shrink-0">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto flex-1">
+                <div class="relative w-full sm:max-w-xs">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="search_units" placeholder="Search units..." 
+                        class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-gray-800">
                 </div>
-                <input type="text" id="search_units" placeholder="Search units..." 
-                    class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
+                <select id="filter_type" class="block w-full sm:w-48 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-gray-800">
+                    <option value="all">All Types</option>
+                    <option value="academic">Academic Faculty</option>
+                    <option value="admin">Administrative Department</option>
+                </select>
+                <select id="filter_status" class="block w-full sm:w-40 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-gray-800">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <select id="sort_order" class="block w-full sm:w-48 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-gray-800">
+                    <option value="az">A–Z</option>
+                    <option value="za">Z–A</option>
+                    <option value="newest">Recently Added</option>
+                </select>
             </div>
-            
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
-                <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Add Unit
-                </button>
-            </div>
+            <button onclick="openAddModal()" class="w-full lg:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Unit
+            </button>
         </div>
 
         <?php
@@ -135,15 +169,18 @@ $stats = [
                 $icon = 'graduation-cap';
                 $typeClass = 'academic';
             }
+            $statusClass = strtolower($fac['status']) === 'active' ? 'active' : 'inactive';
             
             $facId = (int)$fac['id'];
             $faculties_data[$facId] = [
                 'id' => $fac['id'],
                 'name' => $fac['faculty_name'],
                 'code' => $fac['faculty_code'],
+                'type' => $fac['faculty_type'],
                 'vision' => $fac['vision'],
                 'mission' => $fac['mission'],
                 'description' => $fac['description'],
+                'status' => $fac['status'],
                 'courses' => $fac['course_count'],
                 'created_at' => date('M d, Y', strtotime($fac['created_at'])),
                 'updated_at' => date('M d, Y', strtotime($fac['updated_at'])),
@@ -152,6 +189,9 @@ $stats = [
             
             $desc = htmlspecialchars($fac['description'] ?: ($fac['vision'] ?: 'No description provided.'));
             $name = htmlspecialchars($fac['faculty_name']);
+            $status = htmlspecialchars($fac['status']);
+            $statusBadge = $status === 'Active' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700';
+            $displayType = htmlspecialchars($fac['faculty_type'] ?: 'Unit');
             $dateTimestamp = strtotime($fac['created_at']);
             $courseCount = (int)$fac['course_count'];
             $nameLower = strtolower($name);
@@ -162,6 +202,7 @@ $stats = [
                  data-name="' . $nameLower . '" 
                  data-code="' . $codeLower . '"
                  data-type="' . $typeClass . '"
+                 data-status="' . $statusClass . '"
                  data-date="' . $dateTimestamp . '">
                  
                 <div class="p-5 flex-1 flex flex-col border-b border-gray-50">
@@ -169,9 +210,13 @@ $stats = [
                         <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider border ' . $badgeColor . '">
                             ' . $code . '
                         </span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ' . $statusBadge . ' border border-white/0">
+                            ' . $status . '
+                        </span>
                     </div>
                     
-                    <h3 class="text-[17px] font-bold text-gray-900 leading-snug mb-3">' . $name . '</h3>
+                    <h3 class="text-[17px] font-bold text-gray-900 leading-snug mb-1.5">' . $name . '</h3>
+                    <p class="text-[11px] font-semibold text-gray-400 mb-3 uppercase tracking-wider">' . $displayType . '</p>
                     
                     <p class="text-[13px] text-gray-500 line-clamp-2 flex-1 leading-relaxed">
                         ' . $desc . '
@@ -268,19 +313,20 @@ $stats = [
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-xs font-bold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded" id="view_code">CODE</span>
+                            <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded" id="view_type">Type</span>
                         </div>
                         <h3 class="text-xl leading-6 font-bold text-gray-900 mb-4" id="view_name">Faculty Name</h3>
                         
-                        <div class="space-y-4" id="view_details_container">
-                            <div id="view_vision_container">
+                        <div class="space-y-4">
+                            <div>
                                 <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vision</h4>
                                 <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 text-sm text-gray-700" id="view_vision"></div>
                             </div>
-                            <div id="view_mission_container">
+                            <div>
                                 <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Mission</h4>
                                 <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 text-sm text-gray-700" id="view_mission"></div>
                             </div>
-                            <div id="view_desc_container">
+                            <div>
                                 <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description</h4>
                                 <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 text-sm text-gray-700" id="view_desc"></div>
                             </div>
@@ -340,6 +386,30 @@ $stats = [
                             </div>
                         </div>
 
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-2 sm:col-span-1">
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Faculty Type</label>
+                                <div class="relative">
+                                    <select id="form_type" name="type" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                                        <option value="Academic Faculty">Academic Faculty</option>
+                                        <option value="Department">Department</option>
+                                        <option value="Administrative Office">Administrative Office</option>
+                                        <option value="Support Unit">Support Unit</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-span-2 sm:col-span-1">
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
+                                <div class="relative">
+                                    <select id="form_status" name="status" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Vision</label>
@@ -459,31 +529,10 @@ function viewFaculty(fac) {
     try {
         document.getElementById('view_name').textContent = fac.name || 'Unknown';
         document.getElementById('view_code').textContent = fac.code || 'N/A';
-        
-        const visionContainer = document.getElementById('view_vision_container');
-        if (fac.vision && fac.vision.trim() !== '') {
-            document.getElementById('view_vision').textContent = fac.vision;
-            visionContainer.classList.remove('hidden');
-        } else {
-            visionContainer.classList.add('hidden');
-        }
-
-        const missionContainer = document.getElementById('view_mission_container');
-        if (fac.mission && fac.mission.trim() !== '') {
-            document.getElementById('view_mission').textContent = fac.mission;
-            missionContainer.classList.remove('hidden');
-        } else {
-            missionContainer.classList.add('hidden');
-        }
-
-        const descContainer = document.getElementById('view_desc_container');
-        if (fac.description && fac.description.trim() !== '') {
-            document.getElementById('view_desc').textContent = fac.description;
-            descContainer.classList.remove('hidden');
-        } else {
-            descContainer.classList.add('hidden');
-        }
-
+        document.getElementById('view_type').textContent = fac.type || 'N/A';
+        document.getElementById('view_vision').textContent = fac.vision || 'N/A';
+        document.getElementById('view_mission').textContent = fac.mission || 'N/A';
+        document.getElementById('view_desc').textContent = fac.description || 'N/A';
         document.getElementById('view_courses').textContent = fac.courses || '0';
         document.getElementById('view_created').textContent = fac.created_at || 'N/A';
         document.getElementById('view_updated').textContent = fac.updated_at || 'N/A';
@@ -534,6 +583,8 @@ function openEditModal(fac) {
         document.getElementById('form_id').value = fac.id;
         document.getElementById('form_name').value = fac.name || '';
         document.getElementById('form_code').value = fac.code || '';
+        document.getElementById('form_type').value = fac.type || 'Academic Faculty';
+        document.getElementById('form_status').value = fac.status || 'Active';
         document.getElementById('form_vision').value = fac.vision || '';
         document.getElementById('form_mission').value = fac.mission || '';
         document.getElementById('form_desc').value = fac.description || '';
@@ -643,14 +694,20 @@ document.getElementById('btn_confirm_delete').addEventListener('click', async fu
     }
 });
 
-// Search and Filter Logic
+// Search, Filter, Sort Logic
 const searchInput = document.getElementById('search_units');
+const typeFilter = document.getElementById('filter_type');
+const statusFilter = document.getElementById('filter_status');
+const sortOrder = document.getElementById('sort_order');
 const allCards = Array.from(document.querySelectorAll('.unit-card'));
 const emptyState = document.getElementById('search_empty_state');
 const sections = document.querySelectorAll('.section-container');
 
 function applyFiltersAndSort() {
     const term = searchInput.value.toLowerCase();
+    const type = typeFilter.value;
+    const status = statusFilter.value;
+    const sort = sortOrder.value;
 
     let visibleCount = 0;
 
@@ -658,10 +715,14 @@ function applyFiltersAndSort() {
     allCards.forEach(card => {
         const name = card.getAttribute('data-name');
         const code = card.getAttribute('data-code');
+        const cType = card.getAttribute('data-type');
+        const cStatus = card.getAttribute('data-status');
         
         const matchesSearch = name.includes(term) || code.includes(term);
+        const matchesType = type === 'all' || cType === type;
+        const matchesStatus = status === 'all' || cStatus === status;
 
-        if (matchesSearch) {
+        if (matchesSearch && matchesType && matchesStatus) {
             card.classList.remove('hidden');
             visibleCount++;
         } else {
@@ -669,10 +730,23 @@ function applyFiltersAndSort() {
         }
     });
 
-    // Filter within each section
+    // Sort within each section
     sections.forEach(section => {
         const grid = section.querySelector('.section-grid');
         const cardsInSection = Array.from(grid.querySelectorAll('.unit-card'));
+        
+        cardsInSection.sort((a, b) => {
+            if (sort === 'az') {
+                return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+            } else if (sort === 'za') {
+                return b.getAttribute('data-name').localeCompare(a.getAttribute('data-name'));
+            } else if (sort === 'newest') {
+                return parseInt(b.getAttribute('data-date')) - parseInt(a.getAttribute('data-date'));
+            }
+            return 0;
+        });
+        
+        cardsInSection.forEach(card => grid.appendChild(card)); // Reattach in new order
         
         // Hide section if no visible cards
         const visibleInSection = cardsInSection.filter(c => !c.classList.contains('hidden')).length;
@@ -695,37 +769,23 @@ function applyFiltersAndSort() {
 
 if (searchInput) {
     searchInput.addEventListener('input', applyFiltersAndSort);
+    typeFilter.addEventListener('change', applyFiltersAndSort);
+    statusFilter.addEventListener('change', applyFiltersAndSort);
+    sortOrder.addEventListener('change', applyFiltersAndSort);
 
-    // Initial filter
+    // Initial sort
     applyFiltersAndSort();
-
-    // Restore scroll position after navigation
-    if (sessionStorage.getItem('facultiesScroll')) {
-        window.scrollTo(0, parseInt(sessionStorage.getItem('facultiesScroll')));
-        sessionStorage.removeItem('facultiesScroll');
-    }
-
-    // Show update success toast
-    if (sessionStorage.getItem('facultyUpdateSuccess')) {
-        const alertBox = document.getElementById('top_success_alert');
-        if (alertBox) {
-            document.getElementById('top_success_message').textContent = 'Faculty updated successfully.';
-            alertBox.classList.remove('hidden');
-            alertBox.classList.add('flex');
-        }
-        sessionStorage.removeItem('facultyUpdateSuccess');
-    }
 }
 
 // Event delegation for card buttons
 function viewFacultyById(id) {
-    sessionStorage.setItem('facultiesScroll', window.scrollY);
-    window.location.href = 'view_faculty.php?id=' + id;
+    const fac = facultiesData[id];
+    if(fac) viewFaculty(fac);
 }
 
 function editFacultyById(id) {
-    sessionStorage.setItem('facultiesScroll', window.scrollY);
-    window.location.href = 'edit_faculty.php?id=' + id;
+    const fac = facultiesData[id];
+    if(fac) openEditModal(fac);
 }
 </script>
 

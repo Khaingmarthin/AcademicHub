@@ -12,7 +12,10 @@ $categories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
 $ayStmt = $pdo->query("SELECT id, year_name as name FROM academic_years ORDER BY start_date DESC");
 $academic_years = $ayStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<?php include '../includes/header.php'; ?>
+<?php 
+$is_public_area = true;
+include '../includes/header.php'; 
+?>
 <?php include '../includes/navbar.php'; ?>
 
 <div class="bg-gray-50 min-h-screen py-8">

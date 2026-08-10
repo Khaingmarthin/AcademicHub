@@ -3,7 +3,10 @@ http_response_code(404);
 require_once '../config/db.php';
 require_once '../config/functions.php';
 ?>
-<?php include '../includes/header.php'; ?>
+<?php 
+$is_public_area = true;
+include '../includes/header.php'; 
+?>
 <?php include '../includes/navbar.php'; ?>
 
 <div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">

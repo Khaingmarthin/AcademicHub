@@ -8,7 +8,7 @@ $is_public_area = strpos($_SERVER['PHP_SELF'], '/public/') !== false || (strpos(
             <?php if ($is_public_area): ?>
             <!-- Public Footer -->
             <footer class="bg-[#0f172a] text-gray-300 pt-16 pb-8 border-t border-gray-800 mt-auto">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-10 xl:px-12">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
                         
                         <!-- Brand & Info -->
@@ -147,8 +147,11 @@ $is_public_area = strpos($_SERVER['PHP_SELF'], '/public/') !== false || (strpos(
                 </div>
             </footer>
             <?php endif; ?>
+            
+        <?php if (!$is_public_area): ?>
         </div>
     </div>
+        <?php endif; ?>
 <?php endif; ?>
     <!-- Scripts -->
     <script src="<?php echo htmlspecialchars(base_url('/assets/js/main.js?v=' . time())); ?>"></script>

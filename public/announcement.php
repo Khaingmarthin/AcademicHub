@@ -72,7 +72,10 @@ if ($is_student && $id) {
     $is_bookmarked = (bool)$stmt_bookmark->fetch();
 }
 ?>
-<?php include '../includes/header.php'; ?>
+<?php 
+$is_public_area = true;
+include '../includes/header.php'; 
+?>
 <?php include '../includes/navbar.php'; ?>
 
 <div class="min-h-screen bg-[#F5F7FB] py-10">

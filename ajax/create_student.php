@@ -38,12 +38,12 @@ if (empty($student_id) || empty($roll_number) || empty($username) || empty($emai
 }
 
 if ($password !== $password_confirm) {
-    echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
+    echo json_encode(['success' => false, 'message' => 'Passwords do not match.', 'field' => 'add_password_confirm']);
     exit;
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid email format.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid email format.', 'field' => 'add_email']);
     exit;
 }
 
@@ -52,7 +52,7 @@ try {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
     $stmt->execute(['email' => $email]);
     if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Email address is already in use.']);
+        echo json_encode(['success' => false, 'message' => 'Email address is already in use.', 'field' => 'add_email']);
         exit;
     }
 
@@ -60,7 +60,7 @@ try {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE student_id = :sid");
     $stmt->execute(['sid' => $student_id]);
     if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Student ID is already assigned.']);
+        echo json_encode(['success' => false, 'message' => 'Student ID is already assigned.', 'field' => 'add_student_id']);
         exit;
     }
 
@@ -68,7 +68,7 @@ try {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE roll_number = :roll");
     $stmt->execute(['roll' => $roll_number]);
     if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Roll Number is already in use.']);
+        echo json_encode(['success' => false, 'message' => 'Roll Number is already in use.', 'field' => 'add_roll_number']);
         exit;
     }
 

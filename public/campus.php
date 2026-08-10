@@ -2,7 +2,10 @@
 require_once '../config/db.php';
 require_once '../config/functions.php';
 ?>
-<?php include '../includes/header.php'; ?>
+<?php 
+$is_public_area = true;
+include '../includes/header.php'; 
+?>
 <?php include '../includes/navbar.php'; ?>
 
 <!-- PAGE HEADER -->

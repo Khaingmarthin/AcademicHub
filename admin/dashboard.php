@@ -5,7 +5,7 @@ require_once '../config/db.php';
 require_once '../config/functions.php';
 
 // Fetch Current Academic Year based on session
-$active_ay_id = $_SESSION['current_academic_year_id'] ?? 0;
+$active_ay_id = get_global_active_academic_year($pdo)['id'] ?? 0;
 if ($active_ay_id) {
     $stmt = $pdo->prepare("SELECT id, year_name as name FROM academic_years WHERE id = :id LIMIT 1");
     $stmt->execute(['id' => $active_ay_id]);
@@ -42,8 +42,6 @@ $stats['draft'] = $pdo->query("SELECT COUNT(*) FROM announcements a LEFT JOIN ac
 
 // Archived (ay status is archived)
 $stats['archived'] = $pdo->query("SELECT COUNT(*) FROM announcements a JOIN academic_years ay ON a.academic_year_id = ay.id WHERE ay.status = 'archived' $ay_condition_a")->fetchColumn();
-
-
 
 // Fetch Latest Announcements joining Categories and counting comments
 $stmt = $pdo->query("SELECT a.id, a.title, a.created_at, a.status, a.is_urgent, a.is_featured, a.publish_date, c.category_name,
@@ -137,6 +135,7 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
                 <h2 class="text-2xl font-bold tracking-tight"><?php echo $greeting; ?>, Admin 👋</h2>
                 <p class="text-blue-100 mt-1.5 font-medium text-base">Academic Hub &ndash; UCSMTLA</p>
                 <p class="text-blue-200 mt-0.5 text-xs">Manage university announcements, students and timetables efficiently.</p>
+                <p class="mt-3 text-sm font-semibold bg-white/20 inline-block px-3 py-1 rounded-full backdrop-blur-sm">📅 Academic Year: <?php echo htmlspecialchars($current_academic_year); ?> (Active)</p>
             </div>
             <div class="text-left md:text-right flex-shrink-0 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
                 <p class="text-[10px] font-semibold text-blue-200 uppercase tracking-wider mb-0.5">Today's Date</p>
@@ -186,7 +185,7 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
     </div>
 
     <!-- Statistics Cards Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Total Announcements -->
         <div class="bg-white rounded-xl shadow-sm border-t-4 border-blue-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
@@ -198,7 +197,7 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
             <p class="text-xs font-medium text-gray-400">Total Announcements</p>
         </div>
 
-        <!-- Published Announcements -->
+        <!-- Published News -->
         <div class="bg-white rounded-xl shadow-sm border-t-4 border-green-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <div class="flex justify-between items-start mb-3">
                 <span class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">↑ 8% this month</span>
@@ -208,7 +207,7 @@ $status_data = [$stats['published'], $stats['draft'], $stats['archived']];
             <p class="text-xs font-medium text-gray-400">Published News</p>
         </div>
 
-    <!-- Draft Announcements -->
+        <!-- Draft Status -->
         <div class="bg-white rounded-xl shadow-sm border-t-4 border-yellow-500 border border-gray-100 p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <div class="flex justify-between items-start mb-3">
                 <span class="text-xs font-semibold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">↓ 3% this week</span>

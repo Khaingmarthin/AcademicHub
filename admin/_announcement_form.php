@@ -3,7 +3,7 @@
 $title = $announcement['title'] ?? '';
 $content = $announcement['content'] ?? '';
 $category_id = $announcement['category_id'] ?? '';
-$academic_year_id = $announcement['academic_year_id'] ?? ($_SESSION['current_academic_year_id'] ?? '');
+$academic_year_id = $announcement['academic_year_id'] ?? (get_global_active_academic_year($pdo)['id'] ?? '');
 $publish_date = !empty($announcement['publish_date']) ? date('Y-m-d\TH:i:s', strtotime($announcement['publish_date'])) : date('Y-m-d\TH:i:s');
 $is_urgent = $announcement['is_urgent'] ?? 0;
 

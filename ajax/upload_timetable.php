@@ -26,7 +26,7 @@ if ($classroom_id === 0 || !in_array($semester, ['first', 'second'])) {
 }
 
 // Ensure there is an active academic year based on session
-$active_ay_id = $_SESSION['current_academic_year_id'] ?? 0;
+$active_ay_id = get_global_active_academic_year($pdo)['id'] ?? 0;
 if (!$active_ay_id) {
     $stmt = $pdo->query("SELECT id FROM academic_years WHERE status = 'Active' LIMIT 1");
     $active_ay_id = $stmt->fetchColumn();

@@ -38,9 +38,15 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/sidebar.php'; ?>
 <?php include '../includes/navbar.php'; ?>
 
+<style>
+.modal-enter { opacity: 0; transform: scale(0.95); }
+.modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
+.modal-leave { opacity: 1; transform: scale(1); }
+.modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
+</style>
 
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8 pt-8">
         
         <!-- Page Header -->
         <div class="mb-8">
@@ -58,69 +64,44 @@ $csrf_token = generate_csrf_token();
             </div>
 
             <!-- Toolbar -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
-                <div class="flex flex-col xl:flex-row gap-4 w-full">
-                    
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
+                
+                <div class="flex flex-col md:flex-row w-full xl:w-auto gap-4 flex-1">
                     <!-- Search Bar -->
-                    <div class="relative w-full xl:w-96 flex-shrink-0">
+                    <div class="relative w-full md:w-64">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                         </div>
                         <input type="text" id="filter_search" placeholder="Search classroom..." 
-                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] text-sm font-medium transition-colors text-gray-900 h-[42px]">
+                            class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] sm:text-sm font-medium transition-all duration-200 text-gray-800">
                     </div>
                     
                     <!-- Filters -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 w-full">
-                        <div class="relative w-full">
-                            <select id="filter_ay" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
-                                <option value="">All Academic Years</option>
-                                <?php foreach ($academic_years as $ay): ?>
-                                <option value="<?php echo $ay['id']; ?>" <?php echo $ay['id'] == $active_ay_id ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($ay['year_name']); ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                        </div>
-                        
-                        <div class="relative w-full">
-                            <select id="filter_major" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
-                                <option value="">All Majors</option>
-                                <?php foreach ($majors as $m): ?>
-                                <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                        </div>
-                        
-                        <div class="relative w-full">
-                            <select id="filter_year" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
-                                <option value="">All Years</option>
-                                <?php foreach ($year_levels as $yl): ?>
-                                <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                        </div>
-                        
-                        <div class="relative w-full">
-                            <select id="filter_status" class="block w-full py-2 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none h-[42px]">
-                                <option value="">All Statuses</option>
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 xl:flex-shrink-0 w-full xl:w-auto">
-                        <button onclick="openAddModal()" class="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 h-[42px]">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Add Classroom
-                        </button>
+                    <div class="grid grid-cols-2 md:flex gap-3 w-full md:w-auto">
+
+                        <select id="filter_major" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                            <option value="">All Majors</option>
+                            <?php foreach ($majors as $m): ?>
+                            <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['major_name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="filter_year" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                            <option value="">All Years</option>
+                            <?php foreach ($year_levels as $yl): ?>
+                            <option value="<?php echo $yl['id']; ?>"><?php echo htmlspecialchars($yl['level_name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="filter_status" class="block w-full py-2.5 pl-3 pr-8 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                            <option value="">All Statuses</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
                     </div>
                 </div>
+                
+                <button onclick="openAddModal()" class="w-full xl:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm hover:shadow-md transition-all duration-200">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add Classroom
+                </button>
             </div>
 
             <!-- Cards Grid -->
@@ -316,18 +297,7 @@ $csrf_token = generate_csrf_token();
                     </div>
                     
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Academic Year <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <select id="form_ay" name="academic_year_id" required class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
-                                    <option value="">Select Academic Year...</option>
-                                    <?php foreach ($academic_years as $ay): ?>
-                                    <option value="<?php echo $ay['id']; ?>"><?php echo htmlspecialchars($ay['year_name']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-                            </div>
-                        </div>
+                        <input type="hidden" id="form_ay" name="academic_year_id" value="<?php echo $active_ay_id; ?>">
 
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Major <span class="text-red-500">*</span></label>
@@ -698,7 +668,6 @@ function applyFilters() {
     if (!document.getElementById('filter_search')) return;
     
     const term = document.getElementById('filter_search').value.toLowerCase();
-    const ayFilter = document.getElementById('filter_ay').value;
     const majorFilter = document.getElementById('filter_major').value;
     const yearFilter = document.getElementById('filter_year').value;
     const statusFilter = document.getElementById('filter_status').value;
@@ -708,14 +677,12 @@ function applyFilters() {
     
     cards.forEach(card => {
         const searchData = card.getAttribute('data-search');
-        const ayData = card.getAttribute('data-ay');
         const majorData = card.getAttribute('data-major');
         const yearData = card.getAttribute('data-year');
         const statusData = card.getAttribute('data-status');
         
         let match = true;
         if (term && !searchData.includes(term)) match = false;
-        if (ayFilter && ayData !== ayFilter) match = false;
         if (majorFilter && majorData !== majorFilter) match = false;
         if (yearFilter && yearData !== yearFilter) match = false;
         if (statusFilter && statusData !== statusFilter) match = false;
@@ -738,7 +705,6 @@ function applyFilters() {
 }
 
 document.getElementById('filter_search').addEventListener('input', applyFilters);
-document.getElementById('filter_ay').addEventListener('change', applyFilters);
 document.getElementById('filter_major').addEventListener('change', applyFilters);
 document.getElementById('filter_year').addEventListener('change', applyFilters);
 document.getElementById('filter_status').addEventListener('change', applyFilters);

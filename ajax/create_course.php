@@ -32,6 +32,12 @@ if (empty($name) || empty($code) || $faculty_id <= 0) {
     exit;
 }
 
+$academic_year_id = get_global_active_academic_year($pdo)['id'] ?? null;
+if (!$academic_year_id) {
+    echo json_encode(['success' => false, 'message' => 'No active academic year selected. Please select an academic year from the header.']);
+    exit;
+}
+
 try {
     // Check for duplicate code
     $stmt = $pdo->prepare("SELECT id FROM courses WHERE course_code = :code");
@@ -41,8 +47,9 @@ try {
         exit;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO courses (faculty_id, course_name, course_code, major, year_level, semester, credits, description, status) VALUES (:faculty_id, :name, :code, :major, :year_level, :semester, :credits, :desc, :status)");
+    $stmt = $pdo->prepare("INSERT INTO courses (academic_year_id, faculty_id, course_name, course_code, major, year_level, semester, credits, description, status) VALUES (:academic_year_id, :faculty_id, :name, :code, :major, :year_level, :semester, :credits, :desc, :status)");
     $stmt->execute([
+        'academic_year_id' => $academic_year_id,
         'faculty_id' => $faculty_id,
         'name' => $name,
         'code' => $code,

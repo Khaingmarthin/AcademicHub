@@ -5,7 +5,7 @@ require_once '../config/db.php';
 require_once '../config/functions.php';
 
 // Fetch Academic Year based on session
-$active_ay_id = $_SESSION['current_academic_year_id'] ?? 0;
+$active_ay_id = get_global_active_academic_year($pdo)['id'] ?? 0;
 if ($active_ay_id) {
     $stmt = $pdo->prepare("SELECT id, year_name as name FROM academic_years WHERE id = :id LIMIT 1");
     $stmt->execute(['id' => $active_ay_id]);

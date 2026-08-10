@@ -135,4 +135,26 @@ function get_calculated_status($pdo, $publish_date, $academic_year_id) {
     }
     return 'published';
 }
+
+/**
+ * Get the global active academic year from the database.
+ * Caches the result statically per request to avoid redundant queries.
+ */
+function get_global_active_academic_year($pdo) {
+    static $active_year = null;
+    if ($active_year === null) {
+        try {
+            $stmt = $pdo->query("SELECT id, year_name as name, status FROM academic_years WHERE status = 'active' LIMIT 1");
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                $active_year = $row;
+            } else {
+                $active_year = ['id' => 0, 'name' => 'Not Set', 'status' => ''];
+            }
+        } catch (PDOException $e) {
+            $active_year = ['id' => 0, 'name' => 'Not Set', 'status' => ''];
+        }
+    }
+    return $active_year;
+}
 ?>

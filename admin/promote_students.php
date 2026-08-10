@@ -17,7 +17,7 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/navbar.php'; ?>
 
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8 pt-8">
         
         <!-- Page Header -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">

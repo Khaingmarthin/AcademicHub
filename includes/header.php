@@ -33,7 +33,10 @@
     </script>
 </head>
 <body class="bg-[#F5F7FB] dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased flex flex-col min-h-screen transition-colors duration-300">
-<?php $is_auth_page = $is_auth_page ?? false; ?>
-<?php if (!$is_auth_page): ?>
+<?php 
+$is_auth_page = $is_auth_page ?? false;
+$is_public_area = $is_public_area ?? (strpos($_SERVER['PHP_SELF'], '/public/') !== false || (strpos($_SERVER['PHP_SELF'], '/index.php') !== false && !isset($_SESSION['user_id'])));
+?>
+<?php if (!$is_auth_page && !$is_public_area): ?>
     <div class="flex flex-1 h-screen overflow-hidden">
 <?php endif; ?>

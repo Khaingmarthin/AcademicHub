@@ -40,21 +40,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     }
 }
 
-// Initialize current academic year if logged in but not set
-if (isset($_SESSION['user_id']) && !isset($_SESSION['current_academic_year_id'])) {
-    if (!isset($pdo)) {
-        if (file_exists(__DIR__ . '/db.php')) {
-            require_once __DIR__ . '/db.php';
-        }
-    }
-    if (isset($pdo)) {
-        $stmt = $pdo->query("SELECT id FROM academic_years WHERE status = 'Active' LIMIT 1");
-        $active_year = $stmt->fetch();
-        if ($active_year) {
-            $_SESSION['current_academic_year_id'] = $active_year['id'];
-        }
-    }
-}
 
 /**
  * Check if user is logged in

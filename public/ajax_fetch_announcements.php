@@ -87,7 +87,7 @@ $html = '';
 if ($count > 0) {
     foreach ($announcements as $a) {
         $urgent_class = $a['is_urgent'] ? 'border-red-200 ring-2 ring-red-500/20' : 'border-gray-100';
-        $html .= '<a href="announcement.php?id=' . $a['id'] . '" class="group bg-white rounded-3xl shadow-sm hover:shadow-xl border overflow-hidden flex flex-col transform transition-all duration-300 hover:-translate-y-2 ' . $urgent_class . '">';
+        $html .= '<a href="announcement.php?id=' . $a['id'] . '" class="group bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] border overflow-hidden flex flex-col transform transition-all duration-300 ease-in-out hover:scale-[1.02] ' . $urgent_class . '">';
         
         $html .= '<div class="h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center border-b border-gray-100">';
         
@@ -107,26 +107,16 @@ if ($count > 0) {
         
         $html .= '</div>';
         
-        $html .= '<div class="p-5 sm:p-6 flex-1 flex flex-col">';
-        $html .= '<div class="flex items-center justify-between mb-4">';
-        $html .= '<span class="text-xs font-bold tracking-wider uppercase text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">' . htmlspecialchars($a['category_name'] ?? 'General') . '</span>';
-        $html .= '<span class="text-[11px] sm:text-xs text-gray-500 font-medium flex items-center">
-                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    ' . date('M d, Y', strtotime($a['publish_date'] ?? $a['created_at'])) . '
-                  </span>';
+        $html .= '<div class="p-8 flex-1 flex flex-col">';
+        $html .= '<div class="flex items-center gap-3 mb-4">';
+        $html .= '<span class="text-[10px] font-bold tracking-wider uppercase text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100/50">' . htmlspecialchars($a['category_name'] ?? 'General') . '</span>';
+        $html .= '<span class="text-xs text-gray-500 font-medium flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5"></i>' . date('M d, Y', strtotime($a['publish_date'] ?? $a['created_at'])) . '</span>';
         $html .= '</div>';
-        
-        $html .= '<h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">' . htmlspecialchars($a['title']) . '</h3>';
-        $html .= '<p class="text-gray-600 text-sm mb-6 line-clamp-3 flex-1">' . htmlspecialchars(strip_tags($a['content'])) . '</p>';
-        
-        $html .= '<div class="mt-auto pt-4 border-t border-gray-100">
-                    <span class="inline-flex items-center text-sm font-bold text-blue-600 group-hover:text-blue-800 transition-colors">
-                        Read More
-                        <svg class="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </span>
-                  </div>';
-        $html .= '</div>';
-        $html .= '</a>';
+        $html .= '<h3 class="text-[24px] font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 leading-[32px]">' . htmlspecialchars($a['title']) . '</h3>';
+        $html .= '<p class="text-gray-500 text-base mb-6 line-clamp-3 leading-relaxed">' . htmlspecialchars(strip_tags($a['content'])) . '</p>';
+        $html .= '<div class="mt-auto">';
+        $html .= '<span class="inline-flex items-center text-[18px] font-semibold text-blue-600 group-hover:text-blue-800 transition-colors bg-blue-50/50 group-hover:bg-blue-100/50 px-5 py-2.5 rounded-[18px] border border-blue-100/50">Read Full Announcement<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform"></i></span>';
+        $html .= '</div></div></a>';
     }
 } else {
     $html = '<div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-10 rounded-2xl shadow-sm border border-gray-100 text-center">
