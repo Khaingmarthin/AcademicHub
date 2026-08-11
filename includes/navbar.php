@@ -45,7 +45,7 @@ elseif (preg_match('/android/i', $user_agent)) $platform = "Android";
 elseif (preg_match('/iphone/i', $user_agent)) $platform = "iOS";
 ?>
 
-<header class="admin-header bg-white text-gray-800 border-b border-gray-200/60 shadow-sm z-30 sticky top-0 flex-shrink-0 flex items-center justify-between px-6 lg:px-8 h-[72px] w-full">
+<header class="admin-header bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/70 dark:border-gray-700/60 shadow-sm z-30 fixed top-0 flex-shrink-0 flex items-center justify-between px-6 lg:px-8 h-[72px] w-full">
     <!-- Left: Collapse Icon & System Title -->
     <div class="flex items-center">
         <!-- Mobile Menu Hamburger Button -->
@@ -134,4 +134,4 @@ elseif (preg_match('/iphone/i', $user_agent)) $platform = "iOS";
     </div>
 </header>
 
-<main class="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-8 w-full box-border">
+<main class="flex-1 overflow-y-auto overflow-x-hidden pt-[72px] md:pt-[72px] p-6 md:p-8 w-full box-border">
