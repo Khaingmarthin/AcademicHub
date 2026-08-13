@@ -52,7 +52,7 @@ include '../includes/header.php';
                         </div>
                         <div class="ml-5">
                             <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Address</p>
-                            <p class="text-lg font-bold text-gray-900">Meiktila, Mandalay Region, Myanmar</p>
+                            <p class="text-lg font-bold text-gray-900">Meiktila-Tharzi Road, Pan Taw Sat Village, TawMa Village Group, Meiktila, Mandalay Division.</p>
                         </div>
                     </li>
                     <li class="flex items-start group/item">
@@ -61,7 +61,7 @@ include '../includes/header.php';
                         </div>
                         <div class="ml-5">
                             <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Phone</p>
-                            <p class="text-lg font-bold text-gray-900">09-xxxxxxxxx</p>
+                            <p class="text-lg font-bold text-gray-900">(+95) 64 53 2005</p>
                         </div>
                     </li>
                     <li class="flex items-start group/item">
@@ -70,7 +70,7 @@ include '../includes/header.php';
                         </div>
                         <div class="ml-5">
                             <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Email</p>
-                            <a href="mailto:info@ucsmtla.edu.mm" class="text-lg font-bold text-blue-600 hover:text-blue-800 transition-colors">info@ucsmtla.edu.mm</a>
+                            <a href="mailto:studentaffair@ucsmtla.edu.mm" class="text-lg font-bold text-blue-600 hover:text-blue-800 transition-colors">studentaffair@ucsmtla.edu.mm<br>ucsmtla_admin@ucsmtla.edu.mm</a>
                         </div>
                     </li>
                     <li class="flex items-start group/item">
@@ -79,8 +79,8 @@ include '../includes/header.php';
                         </div>
                         <div class="ml-5">
                             <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Website</p>
-                            <a href="https://ucsmtla.edu.mm" target="_blank" rel="noopener noreferrer" class="text-lg font-bold text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center">
-                                https://ucsmtla.edu.mm
+                            <a href="https://www.ucsmtla.edu.mm" target="_blank" rel="noopener noreferrer" class="text-lg font-bold text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center">
+                                www.ucsmtla.edu.mm
                                 <i data-lucide="external-link" class="w-4 h-4 ml-1.5"></i>
                             </a>
                         </div>

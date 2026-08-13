@@ -77,11 +77,32 @@
     @apply translate-x-0;
   }
 
-  /* Modal Transitions */
-  .modal-enter { opacity: 0; transform: scale(0.95); }
-  .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
-  .modal-leave { opacity: 1; transform: scale(1); }
-  .modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
+  /* Public page navigation pill items (JS toggles .active) */
+  .nav-item {
+    @apply px-5 py-2 rounded-full text-sm font-semibold text-sky-100/85 transition-all duration-300 whitespace-nowrap hover:bg-white/[0.12] hover:text-white;
+  }
+  .nav-item.active {
+    @apply bg-white/20 text-white shadow-[inset_0_1px_3px_rgba(0,0,0,0.15)];
+  }
+
+  /* Public page mobile menu (JS toggles .open) */
+  .mobile-menu {
+    @apply hidden mt-4 bg-white/10 border border-white/20 backdrop-blur-[12px] rounded-[18px] p-3 shadow-[0_20px_40px_-16px_rgba(30,58,138,0.5)];
+  }
+  .mobile-menu.open {
+    @apply block;
+  }
+  .mobile-menu a {
+    @apply block px-[14px] py-[11px] rounded-xl font-semibold text-sky-100/90 transition-all duration-200 hover:bg-white/[0.12] hover:text-white;
+  }
+  .mobile-menu a.active {
+    @apply bg-white/10 text-white;
+  }
+  @media (min-width: 1024px) {
+    .mobile-menu {
+      display: none !important;
+    }
+  }
 }
 
 @layer utilities {

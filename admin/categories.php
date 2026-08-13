@@ -21,15 +21,6 @@ $csrf_token = generate_csrf_token();
 <?php include '../includes/sidebar.php'; ?>
 <?php include '../includes/navbar.php'; ?>
 
-<!-- Add custom styles if needed, but Tailwind should handle it -->
-<style>
-/* For modal transitions */
-.modal-enter { opacity: 0; transform: scale(0.95); }
-.modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
-.modal-leave { opacity: 1; transform: scale(1); }
-.modal-leave-active { opacity: 0; transform: scale(0.95); transition: opacity 200ms, transform 200ms; }
-</style>
-
 <div class="min-h-screen bg-[#F8FAFC] pb-12">
     <div class="w-full px-4 sm:px-6 lg:px-8 pt-8">
         

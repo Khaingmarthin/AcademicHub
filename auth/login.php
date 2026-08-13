@@ -26,7 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
+        $authenticated = false;
+
         if ($user && password_verify($password, $user['password'])) {
+            $authenticated = true;
+        } elseif ($user && password_get_info($user['password'])['algo'] === null && hash_equals($user['password'], $password)) {
+            // Legacy plaintext password — validate and upgrade to a bcrypt hash.
+            $upgraded = password_hash($password, PASSWORD_DEFAULT);
+            $upd = $pdo->prepare("UPDATE users SET password = :pass WHERE id = :id");
+            $upd->execute(['pass' => $upgraded, 'id' => $user['id']]);
+            $authenticated = true;
+        }
+
+        if ($authenticated) {
             // Login successful
             session_regenerate_id(true); // Prevent session fixation
             $_SESSION['user_id'] = $user['id'];

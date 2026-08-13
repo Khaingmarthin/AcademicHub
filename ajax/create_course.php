@@ -32,7 +32,7 @@ if (empty($name) || empty($code) || $faculty_id <= 0) {
     exit;
 }
 
-$academic_year_id = get_global_active_academic_year($pdo)['id'] ?? null;
+$academic_year_id = isset($_POST['academic_year_id']) ? (int)$_POST['academic_year_id'] : (get_global_active_academic_year($pdo)['id'] ?? null);
 if (!$academic_year_id) {
     echo json_encode(['success' => false, 'message' => 'No active academic year selected. Please select an academic year from the header.']);
     exit;

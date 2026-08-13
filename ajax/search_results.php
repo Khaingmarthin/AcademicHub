@@ -68,7 +68,7 @@ try {
 
     // Get results
     $sql = "SELECT a.id, a.title, a.content, a.publish_date, a.created_at, a.is_urgent, c.category_name as category_name,
-                   (SELECT CONCAT('assets/uploads/attachments/', file_name) FROM attachments WHERE announcement_id = a.id AND file_type LIKE 'image/%' LIMIT 1) as image_path
+                   (SELECT file_name FROM attachments WHERE announcement_id = a.id AND file_type LIKE 'image/%' LIMIT 1) as file_name
             FROM announcements a
             LEFT JOIN categories c ON a.category_id = c.id
             LEFT JOIN academic_years ay ON a.academic_year_id = ay.id
@@ -80,6 +80,8 @@ try {
     $stmt->execute($params);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $web_root = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+
     // Format content snippet (remove tags and limit length)
     foreach ($results as &$r) {
         $clean_content = strip_tags($r['content']);
@@ -89,7 +91,20 @@ try {
             $r['snippet'] = $clean_content;
         }
         unset($r['content']); // Don't send full content
-        
+
+        // Resolve the stored image to a path that actually exists on disk
+        $r['image_path'] = null;
+        if (!empty($r['file_name'])) {
+            foreach (['assets/uploads/announcements/', 'assets/uploads/attachments/'] as $base) {
+                $candidate = $base . $r['file_name'];
+                if (file_exists($web_root . $candidate)) {
+                    $r['image_path'] = $candidate;
+                    break;
+                }
+            }
+        }
+        unset($r['file_name']);
+
         $r['formatted_date'] = date('M d, Y', strtotime($r['publish_date'] ?? $r['created_at']));
     }
 

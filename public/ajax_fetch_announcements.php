@@ -3,6 +3,21 @@ session_start();
 require_once '../config/db.php';
 require_once '../config/functions.php';
 
+/**
+ * Resolve a stored attachment file name to an existing, web-accessible path.
+ * Files may live under either uploads/announcements or uploads/attachments.
+ * Returns null when no real file exists.
+ */
+function ucsmtla_attachment_url($file_name) {
+    if (empty($file_name)) return null;
+    $root = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+    foreach (['assets/uploads/announcements/', 'assets/uploads/attachments/'] as $base) {
+        $candidate = $base . $file_name;
+        if (file_exists($root . $candidate)) return $candidate;
+    }
+    return null;
+}
+
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 $category = isset($_GET['category']) ? (int)$_GET['category'] : 0;
 $type = isset($_GET['type']) ? $_GET['type'] : '';
@@ -16,9 +31,10 @@ $published_sql = "(ay.status != 'archived' OR ay.status IS NULL) AND (a.publish_
 $stmt = $pdo->query("SELECT id, year_name FROM academic_years WHERE status = 'active' LIMIT 1");
 $active_ay = $stmt->fetch();
 $active_ay_id = $active_ay ? $active_ay['id'] : 0;
-$ay_sql = $active_ay_id > 0 ? "AND a.academic_year_id = $active_ay_id" : "";
+$ay_cond = $active_ay_id > 0 ? "a.academic_year_id = $active_ay_id" : "";
+$ay_sql = $active_ay_id > 0 ? "AND $ay_cond" : "";
 
-$where = ["$published_sql", "$ay_sql"];
+$where = [$published_sql, $ay_cond];
 $params = [];
 
 if (!empty($q)) {
@@ -69,7 +85,7 @@ if ($no_filters) {
 $limit_clause = $no_filters ? "LIMIT 6" : "LIMIT 50"; // Limit to 50 when filtering to avoid huge lists
 
 $query = "SELECT a.*, c.category_name as category_name,
-                 (SELECT CONCAT('assets/uploads/attachments/', file_name) FROM attachments WHERE announcement_id = a.id AND file_type LIKE 'image/%' LIMIT 1) as image_path
+                 (SELECT file_name FROM attachments WHERE announcement_id = a.id AND file_type LIKE 'image/%' LIMIT 1) as image_file
           FROM announcements a 
           LEFT JOIN categories c ON a.category_id = c.id 
           LEFT JOIN academic_years ay ON a.academic_year_id = ay.id
@@ -80,6 +96,12 @@ $query = "SELECT a.*, c.category_name as category_name,
 $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $announcements = $stmt->fetchAll();
+
+foreach ($announcements as &$a) {
+    $a['image_path'] = ucsmtla_attachment_url($a['image_file'] ?? null);
+    unset($a['image_file']);
+}
+unset($a);
 
 $count = count($announcements);
 $html = '';

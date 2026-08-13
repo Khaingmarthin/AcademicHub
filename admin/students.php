@@ -703,15 +703,6 @@ $csrf_token = generate_csrf_token();
         </div>
     </div>
 </div>
-<style>
-@keyframes slideInRight {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-}
-.animate-slide-in-right {
-    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-</style>
 
 <!-- Import Modal -->
 <div id="modal_import" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">

@@ -34,6 +34,21 @@ $stmt_attach = $pdo->prepare("SELECT * FROM attachments WHERE announcement_id = 
 $stmt_attach->execute(['id' => $id]);
 $all_attachments = $stmt_attach->fetchAll();
 
+/**
+ * Resolve a stored attachment file name to an existing, web-accessible path.
+ * Files may live under either uploads/announcements or uploads/attachments.
+ * Returns null when no real file exists.
+ */
+function ucsmtla_attachment_url($file_name) {
+    if (empty($file_name)) return null;
+    $root = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+    foreach (['assets/uploads/announcements/', 'assets/uploads/attachments/'] as $base) {
+        $candidate = $base . $file_name;
+        if (file_exists($root . $candidate)) return $candidate;
+    }
+    return null;
+}
+
 $images = [];
 $documents = [];
 foreach ($all_attachments as $att) {
@@ -49,10 +64,12 @@ if (count($images) > 0) {
     $cover_image = array_shift($images); // Use the first image as the cover image
 }
 
+$cover_image_url = $cover_image ? ucsmtla_attachment_url($cover_image['file_name']) : null;
+
 // Fetch related announcements
 $stmt_related = $pdo->prepare("
     SELECT a.*, c.category_name,
-           (SELECT file_path FROM attachments WHERE announcement_id = a.id AND file_type LIKE 'image/%' LIMIT 1) as image_path
+           (SELECT file_name FROM attachments WHERE announcement_id = a.id AND file_type LIKE 'image/%' LIMIT 1) as image_file
     FROM announcements a
     LEFT JOIN categories c ON a.category_id = c.id
     WHERE a.category_id = :category_id AND a.id != :id
@@ -61,6 +78,12 @@ $stmt_related = $pdo->prepare("
 ");
 $stmt_related->execute(['category_id' => $announcement['category_id'], 'id' => $id]);
 $related_announcements = $stmt_related->fetchAll();
+
+foreach ($related_announcements as &$related) {
+    $related['image_path'] = ucsmtla_attachment_url($related['image_file'] ?? null);
+    unset($related['image_file']);
+}
+unset($related);
 
 $is_student = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'student';
 $user_id = $_SESSION['user_id'] ?? 0;
@@ -99,10 +122,10 @@ include '../includes/header.php';
                 </div>
             <?php endif; ?>
 
-            <?php if ($cover_image): ?>
+            <?php if ($cover_image_url): ?>
                 <!-- Large cover image -->
                 <div class="w-full h-[300px] md:h-[450px] overflow-hidden bg-gray-100">
-                    <img src="../<?php echo htmlspecialchars($cover_image['file_path']); ?>" alt="Cover Image" class="w-full h-full object-cover">
+                    <img src="../<?php echo htmlspecialchars($cover_image_url); ?>" alt="Cover Image" class="w-full h-full object-cover">
                 </div>
             <?php endif; ?>
 
@@ -185,8 +208,9 @@ include '../includes/header.php';
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                             <?php foreach ($images as $img): ?>
-                                <a href="../<?php echo htmlspecialchars($img['file_path']); ?>" target="_blank" class="block h-48 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative bg-gray-100">
-                                    <img src="../<?php echo htmlspecialchars($img['file_path']); ?>" alt="Gallery Image" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105">
+                                <?php $img_url = ucsmtla_attachment_url($img['file_name']); if (!$img_url) continue; ?>
+                                <a href="../<?php echo htmlspecialchars($img_url); ?>" target="_blank" class="block h-48 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative bg-gray-100">
+                                    <img src="../<?php echo htmlspecialchars($img_url); ?>" alt="Gallery Image" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105">
                                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                                         <i data-lucide="maximize" class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                     </div>
@@ -219,7 +243,7 @@ include '../includes/header.php';
                                             </p>
                                         </div>
                                     </div>
-                                    <a href="../<?php echo htmlspecialchars($att['file_path']); ?>" download class="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-colors">
+                                    <a href="../<?php echo htmlspecialchars(ucsmtla_attachment_url($att['file_name'])); ?>" download class="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-colors">
                                         <i data-lucide="download" class="w-5 h-5"></i>
                                     </a>
                                 </div>

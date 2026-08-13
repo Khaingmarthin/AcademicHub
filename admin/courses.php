@@ -4,9 +4,11 @@ require_admin();
 require_once '../config/db.php';
 require_once '../config/functions.php';
 
-$active_ay_id = get_global_active_academic_year($pdo)['id'] ?? 0;
+$academic_years = $pdo->query("SELECT * FROM academic_years ORDER BY id DESC")->fetchAll();
+$global_ay = get_global_active_academic_year($pdo);
+$active_ay_id = isset($_GET['ay_id']) ? (int)$_GET['ay_id'] : ($global_ay['id'] ?? 0);
 
-// Fetch current academic year name
+// Fetch current academic year name based on selected ID
 $stmt = $pdo->prepare("SELECT year_name FROM academic_years WHERE id = :id LIMIT 1");
 $stmt->execute(['id' => $active_ay_id]);
 $active_ay = $stmt->fetch();
@@ -60,6 +62,21 @@ $csrf_token = generate_csrf_token();
                     <p class="text-sm font-semibold text-green-700" id="top_success_message">Success!</p>
                 </div>
             </div>
+
+            <!-- Academic Year Switcher -->
+            <form method="GET" action="courses.php" id="ay_filter_form" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3 w-full max-w-md">
+                <label for="ay_id" class="text-sm font-bold text-gray-700 whitespace-nowrap"><i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i> Academic Year:</label>
+                <div class="relative w-full">
+                    <select name="ay_id" id="ay_id" onchange="document.getElementById('ay_filter_form').submit()" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-colors cursor-pointer appearance-none">
+                        <?php foreach ($academic_years as $ay): ?>
+                            <option value="<?php echo $ay['id']; ?>" <?php echo $ay['id'] == $active_ay_id ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($ay['year_name']); ?> <?php echo $ay['status'] === 'active' ? '(Active)' : ''; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                </div>
+            </form>
 
             <!-- Toolbar -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
@@ -177,6 +194,7 @@ $csrf_token = generate_csrf_token();
                     </div>
                     <form id="form_course" onsubmit="submitCourse(event)">
                         <input type="hidden" id="form_id" name="id">
+                        <input type="hidden" id="form_ay_id" name="academic_year_id" value="<?php echo $active_ay_id; ?>">
                         <div class="p-6">
                             <div class="space-y-4">
                                 <div class="grid grid-cols-3 gap-4">
@@ -460,6 +478,7 @@ function openAddModal() {
     
     document.getElementById('form_course').reset();
     document.getElementById('form_id').value = '';
+    document.getElementById('form_ay_id').value = '<?php echo $active_ay_id; ?>';
     
     const btn = document.getElementById('btn_submit');
     btn.className = 'inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-2.5 bg-[#2563EB] text-sm font-bold text-white hover:bg-blue-700 transition-colors';
@@ -477,6 +496,7 @@ function openEditModal(c) {
     document.getElementById('edit_panel_header').className = 'bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 flex items-center justify-between';
     
     document.getElementById('form_id').value = c.id;
+    document.getElementById('form_ay_id').value = '<?php echo $active_ay_id; ?>';
     document.getElementById('form_name').value = c.name;
     document.getElementById('form_code').value = c.code;
     document.getElementById('form_faculty').value = c.faculty_id;

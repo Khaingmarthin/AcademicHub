@@ -35,7 +35,7 @@ if (empty($title) || empty($content)) {
 // File Upload
 $attachment_path = null;
 if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-    $upload_dir = '../../assets/uploads/announcements/';
+    $upload_dir = __DIR__ . '/../assets/uploads/announcements/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
     
     $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9.\-_]/', '', basename($_FILES['attachment']['name']));
@@ -67,7 +67,7 @@ try {
     $announcement_id = $pdo->lastInsertId();
     if ($attachment_path) {
         $att_stmt = $pdo->prepare("INSERT INTO attachments (announcement_id, file_name, file_type, file_size) VALUES (?, ?, ?, ?)");
-        $att_stmt->execute([$announcement_id, basename($attachment_path), mime_content_type("../../" . $attachment_path) ?: "application/octet-stream", filesize("../../" . $attachment_path) ?: 0]);
+        $att_stmt->execute([$announcement_id, basename($attachment_path), mime_content_type($upload_dir . $filename) ?: "application/octet-stream", filesize($upload_dir . $filename) ?: 0]);
     }
     
     

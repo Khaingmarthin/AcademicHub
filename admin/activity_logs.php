@@ -88,8 +88,9 @@ $actionColors = [
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <?php
-                                    $actionClass = $actionColors[$log['action']] ?? 'bg-gray-100 text-gray-800';
-                                    $actionLabel = str_replace('_', ' ', $log['action']);
+                                    $actionValue = $log['action'] ?? '';
+                                    $actionClass = $actionColors[$actionValue] ?? 'bg-gray-100 text-gray-800';
+                                    $actionLabel = str_replace('_', ' ', $actionValue);
                                     ?>
                                     <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $actionClass; ?> capitalize shadow-sm border border-transparent">
                                         <?php echo htmlspecialchars($actionLabel); ?>

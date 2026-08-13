@@ -90,9 +90,9 @@ try {
         [$lang_id, 'English Proficiency II', 'E-1201', 'First Year', '', 'First Semester', 3],
         [$phys_id, 'Physics', 'P-1201', 'First Year', '', 'First Semester', 3],
         [$math_id, 'Discrete Mathematics', 'CST-1241', 'First Year', '', 'First Semester', 3],
-        [$fcs_id, 'Programming Logic and Design (Programming in C++)', 'CST-1212', 'First Year', '', 'First Semester', 4],
+        [$fcs_id, 'Programming Logic and Design(Programming in C++)', 'CST-1212', 'First Year', '', 'First Semester', 4],
         [$fcs_id, 'Database Fundamentals', 'CST-1223', 'First Year', '', 'First Semester', 4],
-        [$fcst_id, 'Digital Logic Design', 'CST-1234', 'First Year', '', 'First Semester', 4],
+        [$fcst_id, 'Digital and Logic Design', 'CST-1234', 'First Year', '', 'First Semester', 4],
         
         // SECOND YEAR - Computer Science
         [$lang_id, 'English Proficiency IV', 'E-2201', 'Second Year', 'Computer Science', 'First Semester', 3],
@@ -101,24 +101,71 @@ try {
         [$fcs_id, 'Operating Systems', 'CST-2213', 'Second Year', 'Computer Science', 'First Semester', 4],
         [$fcs_id, 'Software Analysis and Design', 'CST-2224', 'Second Year', 'Computer Science', 'First Semester', 4],
         [$fcs_id, 'Data Communication and Networking', 'CST-2235', 'Second Year', 'Computer Science', 'First Semester', 4],
-        [$fcs_id, 'Web Technology (JavaScript)', 'CS-2256', 'Second Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Web Technology(JavaScript)', 'CS-2256', 'Second Year', 'Computer Science', 'First Semester', 4],
 
         // SECOND YEAR - Computer Technology
-        [$lang_id, 'English Proficiency IV', 'E-2201 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 3],
-        [$math_id, 'Differential Equations and Numerical Analysis', 'CST-2241 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 3],
-        [$fcs_id, 'Artificial Intelligence', 'CST-2212 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
-        [$fcs_id, 'Operating Systems', 'CST-2213 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
-        [$fcs_id, 'Software Analysis and Design', 'CST-2224 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
-        [$fcs_id, 'Data Communication and Networking', 'CST-2235 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
+        [$lang_id, 'English Proficiency IV (CT)', 'E-2201 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 3],
+        [$math_id, 'Differential Equations and Numerical Analysis (CT)', 'CST-2241 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 3],
+        [$fcs_id, 'Artificial Intelligence (CT)', 'CST-2212 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Operating Systems (CT)', 'CST-2213 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Software Analysis and Design (CT)', 'CST-2224 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Data Communication and Networking (CT)', 'CST-2235 (CT)', 'Second Year', 'Computer Technology', 'First Semester', 4],
         [$fcst_id, 'Circuits and Electronics', 'CT-2236', 'Second Year', 'Computer Technology', 'First Semester', 4],
         
-        // placeholders for 3rd, 4th, 5th
-        [$fcs_id, 'Third Year CS Course', 'CS-3201', 'Third Year', 'Computer Science', 'First Semester', 4],
-        [$fcst_id, 'Third Year CT Course', 'CT-3201', 'Third Year', 'Computer Technology', 'First Semester', 4],
-        [$fcs_id, 'Fourth Year CS Course', 'CS-4201', 'Fourth Year', 'Computer Science', 'First Semester', 4],
-        [$fcst_id, 'Fourth Year CT Course', 'CT-4201', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
-        [$fcs_id, 'Fifth Year CS Course', 'CS-5201', 'Fifth Year', 'Computer Science', 'First Semester', 4],
-        [$fcst_id, 'Fifth Year CT Course', 'CT-5201', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        // THIRD YEAR - Computer Science
+        [$fcs_id, 'Operating Systems (3rd Yr)', 'CST-3211', 'Third Year', 'Computer Science', 'First Semester', 4],
+        [$math_id, 'Probability and Statistics', 'CST-3242', 'Third Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Professional Ethics', 'CST-3213', 'Third Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Software Quality Assurance and Testing', 'CS-3224', 'Third Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Computer Networks I', 'CST-3235 (3rd Yr)', 'Third Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Human Computer Interaction', 'CST-3256', 'Third Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, '(Supporting Skill IV) Applied Database and Application(ADO.Net, C#)', 'CST-3257(SS)', 'Third Year', 'Computer Science', 'First Semester', 4],
+
+        // THIRD YEAR - Computer Technology
+        [$fcs_id, 'Operating Systems (3rd Yr CT)', 'CST-3211 (CT)', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        [$math_id, 'Probability and Statistics (CT)', 'CST-3242 (CT)', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Professional Ethics (CT)', 'CST-3213 (CT)', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Computer Architecture and Organization II', 'CT-3234', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Computer Networks I (CT)', 'CST-3235 (CT 3rd Yr)', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Human Computer Interaction (CT)', 'CST-3256 (CT)', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, '(Supporting Skill IV) Applied Database and Application(ADO.Net, C#) (CT)', 'CST-3257(SS) (CT)', 'Third Year', 'Computer Technology', 'First Semester', 4],
+        
+        // FOURTH YEAR - Computer Science
+        [$fcs_id, 'Distributed and Parallel Computing', 'CST-4211', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        [$math_id, 'Modeling and Simulations', 'CST-4242', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Object-Oriented Design and Development', 'CS-4223', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Advanced Artificial Intelligence(Knowledge representation and Management, Machine Learning with Python)', 'CS-4214(Elective I A)', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Advanced Database System', 'CS-4225(Elective II A)', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Strategic for Emerging Technologies(Cloud Computing)', 'CS-4216(Elective III A)', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Business Information System (Digital Business and e-Commence)', 'CST-4257(Elective IV A)', 'Fourth Year', 'Computer Science', 'First Semester', 4],
+        
+        // FOURTH YEAR - Computer Technology
+        [$fcs_id, 'Distributed and Parallel Computing (CT)', 'CST-4211 (CT)', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+        [$math_id, 'Modeling and Simulations (CT)', 'CST-4242 (CT)', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Cryptography and Network Security', 'CT-4233', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Embedded Systems Integrating IoT', 'CT-4234', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Signals and Systems', 'CT-4235(Elective I)', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Cyber  Security and Ethical Hacking', 'CT-4236(Elective II)', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Business Information System (Digital Business and e-Commence) (CT)', 'CST-4257(Elective III) (CT)', 'Fourth Year', 'Computer Technology', 'First Semester', 4],
+
+        // FIFTH YEAR - Computer Science
+        [$lang_id, 'Communication in Business English', 'E-5101', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Cyber Security and Digital Forensics', 'CS-5121', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Natural Language Processing', 'CS-5112(Elective I B)', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Data Science Fundamental', 'CST-5123 A(Elective II B)', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Data Analytic and Mining', 'CST-5123 B(Elective II B)', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Strategies for Emerging Technology(Virtualization, Blockchain, Cloud Security and internet of Things)', 'CS-5114(Elective III B)', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+        [$fcs_id, 'Business Information System(Enterprise Resource Planning(ERP))', 'CST-5155(Elective IV B)', 'Fifth Year', 'Computer Science', 'First Semester', 4],
+
+        // FIFTH YEAR - Computer Technology
+        [$lang_id, 'Communication in Business English (CT)', 'E-5101 (CT)', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Digital Forensics', 'CT-5131', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Advanced Networking', 'CT-5132', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Data Science Fundamental (CT)', 'CST-5123 A(Elective) (CT)', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Data Analytic and Mining (CT)', 'CST-5123 B(Elective) (CT)', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Digital Signal Processing', 'CT-5134(Elective)', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcs_id, 'Business Information System(Enterprise Resource Planning(ERP)) (CT)', 'CST-5155(Elective) (CT)', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
+        [$fcst_id, 'Image Processing and Computer Vision', 'CT-5136(Elective)', 'Fifth Year', 'Computer Technology', 'First Semester', 4],
     ];
     
     $stmt = $pdo->prepare("INSERT INTO courses (faculty_id, course_name, course_code, year_level, major, semester, credits, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')");
